@@ -1,6 +1,11 @@
 package cu.edu.cujae.touristpacks.service;
 
+import java.sql.CallableStatement;
+import java.sql.Connection;
+import java.sql.PreparedStatement;
+import java.sql.ResultSet;
 import java.sql.SQLException;
+import java.sql.Types;
 import java.util.ArrayList;
 import java.util.List;
 
@@ -12,10 +17,14 @@ import cu.edu.cujae.touristpacks.core.service.ITransportServiceService;
 import cu.edu.cujae.touristpacks.core.service.ITransportServiceTouristPackService;
 
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.jdbc.core.JdbcTemplate;
 import org.springframework.stereotype.Service;
 
 @Service
 public class TransportServiceTouristPackServiceImpl implements ITransportServiceTouristPackService {
+
+    @Autowired
+    private JdbcTemplate jdbcTemplate;
 
     @Autowired
     ITouristPackService touristPackService;
@@ -27,42 +36,88 @@ public class TransportServiceTouristPackServiceImpl implements ITransportService
     public List<TransportServiceTouristPackDto> getTransportServiceTouristPacks() throws SQLException {
         List<TransportServiceTouristPackDto> list = new ArrayList<>();
 
-        TransportServiceDto transportService1 = transportServiceService.getTransportServices().get(0);
-        TransportServiceDto transportService2 = transportServiceService.getTransportServices().get(1);
+        String function = "{?= call select_all_transport_service_turist_pack()}";
 
-        TouristPackDto touristPack1 = touristPackService.getTouristPacks().get(0);
-        TouristPackDto touristPack2 = touristPackService.getTouristPacks().get(1);
+        Connection connection = jdbcTemplate.getDataSource().getConnection();
+        connection.setAutoCommit(false);
+        CallableStatement statement = connection.prepareCall(function);
+        statement.registerOutParameter(1, Types.OTHER);
+        statement.execute();
 
-        list.add(new TransportServiceTouristPackDto(1, transportService1, touristPack1));
-        list.add(new TransportServiceTouristPackDto(2, transportService2, touristPack2));
+        ResultSet resultSet = (ResultSet) statement.getObject(1);
+
+        while (resultSet.next()) {
+            int id = resultSet.getInt(1);
+            int idPack = resultSet.getInt(2);
+            int idTransportService = resultSet.getInt(3);
+
+            TouristPackDto touristPack = touristPackService.getTouristPackById(idPack);
+            TransportServiceDto transportService = transportServiceService.getTransportServiceById(idTransportService);
+
+            TransportServiceTouristPackDto dto = new TransportServiceTouristPackDto(id, transportService, touristPack);
+            list.add(dto);
+        }
 
         return list;
     }
 
     @Override
-    public TransportServiceTouristPackDto getTransportServiceTouristPackById(int transportServiceTouristPackId)
+    public TransportServiceTouristPackDto getTransportServiceTouristPackById(int idTransportServiceTouristPack)
             throws SQLException {
-        // TODO Auto-generated method stub
-        return null;
+        TransportServiceTouristPackDto transportServiceTouristPack = null;
+
+        PreparedStatement pstmt = jdbcTemplate.getDataSource().getConnection().prepareStatement(
+                "SELECT * FROM transport_service_tourist_pack where id_transport_service_tourist_pack = ?");
+
+        pstmt.setInt(1, idTransportServiceTouristPack);
+
+        ResultSet resultSet = pstmt.executeQuery();
+
+        while (resultSet.next()) {
+            int idTouristPack = resultSet.getInt(1);
+            int idTransportService = resultSet.getInt(2);
+
+            TouristPackDto touristPack = touristPackService.getTouristPackById(idTouristPack);
+            TransportServiceDto transportService = transportServiceService.getTransportServiceById(idTransportService);
+
+            transportServiceTouristPack = new TransportServiceTouristPackDto(idTransportServiceTouristPack,
+                    transportService, touristPack);
+        }
+
+        return transportServiceTouristPack;
     }
 
     @Override
     public void createTransportServiceTouristPack(TransportServiceTouristPackDto transportServiceTouristPack)
             throws SQLException {
-        // TODO Auto-generated method stub
+        String function = "{call transport_service_tourist_pack_insert(?)}";
 
+        CallableStatement statement = jdbcTemplate.getDataSource().getConnection().prepareCall(function);
+        statement.setInt(1, transportServiceTouristPack.getTouristPack().getIdTouristPack());
+        statement.setInt(2, transportServiceTouristPack.getTransportService().getIdTransportService());
+        statement.execute();
     }
 
     @Override
     public void updateTransportServiceTouristPack(TransportServiceTouristPackDto transportServiceTouristPack)
             throws SQLException {
-        // TODO Auto-generated method stub
+        String function = "{call transport_service_tourist_pack_update(?,?)}";
+
+        CallableStatement statement = jdbcTemplate.getDataSource().getConnection().prepareCall(function);
+        statement.setInt(1, transportServiceTouristPack.getIdTransportServiceTouristPack());
+        statement.setInt(2, transportServiceTouristPack.getTouristPack().getIdTouristPack());
+        statement.setInt(3, transportServiceTouristPack.getTransportService().getIdTransportService());
+        statement.execute();
 
     }
 
     @Override
     public void deleteTransportServiceTouristPack(int idTransportServiceTouristPack) throws SQLException {
-        // TODO Auto-generated method stub
+        String function = "{call transport_service_tourist_pack_delete(?)}";
+
+        CallableStatement statement = jdbcTemplate.getDataSource().getConnection().prepareCall(function);
+        statement.setInt(1, idTransportServiceTouristPack);
+        statement.execute();
 
     }
 

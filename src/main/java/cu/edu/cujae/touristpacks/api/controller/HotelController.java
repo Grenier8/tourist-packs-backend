@@ -25,13 +25,13 @@ public class HotelController {
     private IHotelService hotelService;
 
     @GetMapping("/")
-    public ResponseEntity<List<HotelDto>> getHotels() throws SQLException {
+    public ResponseEntity<List<HotelDto>> getAll() throws SQLException {
         List<HotelDto> list = hotelService.getHotels();
         return ResponseEntity.ok(list);
     }
 
     @GetMapping("/{id}")
-    public ResponseEntity<HotelDto> getHotelById(@PathVariable Integer id) throws SQLException {
+    public ResponseEntity<HotelDto> getById(@PathVariable Integer id) throws SQLException {
         HotelDto hotel = hotelService.getHotelById(id);
         return ResponseEntity.ok(hotel);
     }

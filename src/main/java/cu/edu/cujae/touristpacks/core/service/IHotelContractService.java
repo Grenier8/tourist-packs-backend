@@ -10,7 +10,7 @@ public interface IHotelContractService {
 
     HotelContractDto getHotelContractById(int hotelContractId) throws SQLException;
 
-    HotelContractDto getHotelContractByName(String hotelContractName) throws SQLException;
+    HotelContractDto getHotelContractByTitle(String hotelContractName) throws SQLException;
 
     void createHotelContract(HotelContractDto hotelContract) throws SQLException;
 

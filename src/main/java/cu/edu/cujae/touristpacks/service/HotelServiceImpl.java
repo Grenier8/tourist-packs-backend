@@ -11,7 +11,12 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.jdbc.core.JdbcTemplate;
 import org.springframework.stereotype.Service;
 
+import java.sql.CallableStatement;
+import java.sql.Connection;
+import java.sql.PreparedStatement;
+import java.sql.ResultSet;
 import java.sql.SQLException;
+import java.sql.Types;
 import java.util.ArrayList;
 import java.util.List;
 
@@ -19,56 +24,182 @@ import java.util.List;
 public class HotelServiceImpl implements IHotelService {
 
     @Autowired
-    IHotelChainService hotelChainService;
+    private JdbcTemplate jdbcTemplate;
 
     @Autowired
-    IProvinceService provinceService;
+    private IHotelChainService hotelChainService;
+
+    @Autowired
+    private IProvinceService provinceService;
 
     @Override
     public List<HotelDto> getHotels() throws SQLException {
-        List<HotelDto> hotels = new ArrayList<>();
+        List<HotelDto> list = new ArrayList<>();
 
-        HotelChainDto hotelChain1 = hotelChainService.getHotelChains().get(0);
-        HotelChainDto hotelChain2 = hotelChainService.getHotelChains().get(1);
+        String function = "{?= call select_all_hotel()}";
 
-        ProvinceDto province1 = provinceService.getProvinces().get(0);
-        ProvinceDto province2 = provinceService.getProvinces().get(1);
+        Connection connection = jdbcTemplate.getDataSource().getConnection();
+        connection.setAutoCommit(false);
+        CallableStatement statement = connection.prepareCall(function);
+        statement.registerOutParameter(1, Types.OTHER);
+        statement.execute();
 
-        hotels.add(new HotelDto(1, "Royalton Cayo Santa Maria", "Caibarien Villa Clara, 52600", 5, "042350900",
-                "040350950", "cayosantamaria@royalton.com", 5.4, 2, 122, 1, "cayo",
-                hotelChain1, province1));
-        hotels.add(new HotelDto(2, "Hotel Nacional de Cuba", "Calle 21 y O, 10400", 5, "78363564", "78652558",
-                "hotelnacional@grancaribe.com", 16, 0, 426, 2, "ciudad",
-                hotelChain2, province2));
-        return hotels;
+        ResultSet resultSet = (ResultSet) statement.getObject(1);
+
+        while (resultSet.next()) {
+            int idHotel = resultSet.getInt(1);
+            String hotelName = resultSet.getString(2);
+            String address = resultSet.getString(3);
+            String telephoneNumber = resultSet.getString(4);
+            int category = resultSet.getInt(5);
+            String fax = resultSet.getString(6);
+            String email = resultSet.getString(7);
+            double distanceToAirport = resultSet.getDouble(8);
+            double distanceToNearestCity = resultSet.getDouble(9);
+            int roomsAmount = resultSet.getInt(10);
+            int levelsAmount = resultSet.getInt(11);
+            String localization = resultSet.getString(12);
+            int idChain = resultSet.getInt(13);
+            int idProvince = resultSet.getInt(14);
+
+            HotelChainDto hotelChain = hotelChainService.getHotelChainById(idChain);
+            ProvinceDto province = provinceService.getProvinceById(idProvince);
+
+            HotelDto dto = new HotelDto(idHotel, hotelName, address, category, telephoneNumber, fax, email,
+                    distanceToNearestCity, distanceToAirport, roomsAmount, levelsAmount, localization, hotelChain,
+                    province);
+            list.add(dto);
+        }
+
+        return list;
     }
 
     @Override
-    public HotelDto getHotelById(int hotelId) throws SQLException {
-        return getHotels().stream().filter(r -> r.getIdHotel() == hotelId).findFirst().get();
+    public HotelDto getHotelById(int idHotel) throws SQLException {
+        HotelDto hotel = null;
+
+        PreparedStatement pstmt = jdbcTemplate.getDataSource().getConnection().prepareStatement(
+                "SELECT * FROM hotel where id_hotel = ?");
+
+        pstmt.setInt(1, idHotel);
+
+        ResultSet resultSet = pstmt.executeQuery();
+
+        while (resultSet.next()) {
+            String hotelName = resultSet.getString(2);
+            String address = resultSet.getString(3);
+            String telephoneNumber = resultSet.getString(4);
+            int category = resultSet.getInt(5);
+            String fax = resultSet.getString(6);
+            String email = resultSet.getString(7);
+            double distanceToAirport = resultSet.getDouble(8);
+            double distanceToNearestCity = resultSet.getDouble(9);
+            int roomsAmount = resultSet.getInt(10);
+            int levelsAmount = resultSet.getInt(11);
+            String localization = resultSet.getString(12);
+            int idChain = resultSet.getInt(13);
+            int idProvince = resultSet.getInt(14);
+
+            HotelChainDto hotelChain = hotelChainService.getHotelChainById(idChain);
+            ProvinceDto province = provinceService.getProvinceById(idProvince);
+
+            hotel = new HotelDto(idHotel, hotelName, address, category, telephoneNumber, fax, email,
+                    distanceToNearestCity, distanceToAirport, roomsAmount, levelsAmount, localization, hotelChain,
+                    province);
+        }
+
+        return hotel;
     }
 
     @Override
     public void createHotel(HotelDto hotel) throws SQLException {
-        // TODO Auto-generated method stub
+        String function = "{call hotel_insert(?,?,?,?,?,?,?,?,?,?,?,?,?)}";
+
+        CallableStatement statement = jdbcTemplate.getDataSource().getConnection().prepareCall(function);
+        statement.setString(2, hotel.getHotelName());
+        statement.setString(3, hotel.getAddress());
+        statement.setString(4, hotel.getTelephoneNumber());
+        statement.setInt(5, hotel.getCategory());
+        statement.setString(6, hotel.getFax());
+        statement.setString(7, hotel.getEmail());
+        statement.setDouble(8, hotel.getDistanceToAirport());
+        statement.setDouble(9, hotel.getDistanceToNearestCity());
+        statement.setInt(10, hotel.getRoomsAmount());
+        statement.setInt(11, hotel.getLevelsAmount());
+        statement.setString(12, hotel.getLocalization());
+        statement.setInt(13, hotel.getHotelChain().getIdHotelChain());
+        statement.setInt(14, hotel.getProvince().getIdProvince());
+        statement.execute();
 
     }
 
     @Override
     public void updateHotel(HotelDto hotel) throws SQLException {
-        // TODO Auto-generated method stub
+        String function = "{call hotel_update(?,?,?,?,?,?,?,?,?,?,?,?,?,?)}";
+
+        CallableStatement statement = jdbcTemplate.getDataSource().getConnection().prepareCall(function);
+        statement.setInt(2, hotel.getIdHotel());
+        statement.setString(3, hotel.getHotelName());
+        statement.setString(4, hotel.getAddress());
+        statement.setString(5, hotel.getTelephoneNumber());
+        statement.setInt(6, hotel.getCategory());
+        statement.setString(7, hotel.getFax());
+        statement.setString(8, hotel.getEmail());
+        statement.setDouble(9, hotel.getDistanceToAirport());
+        statement.setDouble(10, hotel.getDistanceToNearestCity());
+        statement.setInt(11, hotel.getRoomsAmount());
+        statement.setInt(12, hotel.getLevelsAmount());
+        statement.setString(13, hotel.getLocalization());
+        statement.setInt(14, hotel.getHotelChain().getIdHotelChain());
+        statement.setInt(15, hotel.getProvince().getIdProvince());
+        statement.execute();
 
     }
 
     @Override
-    public void deleteHotel(int id) throws SQLException {
-        // TODO Auto-generated method stub
+    public void deleteHotel(int idHotelChain) throws SQLException {
+        String function = "{call hotel_delete(?)}";
+
+        CallableStatement statement = jdbcTemplate.getDataSource().getConnection().prepareCall(function);
+        statement.setInt(1, idHotelChain);
+        statement.execute();
 
     }
 
     @Override
     public HotelDto getHotelByName(String hotelName) throws SQLException {
-        return getHotels().stream().filter(r -> r.getHotelName().equals(hotelName)).findFirst().get();
-    }
+        HotelDto hotel = null;
 
+        PreparedStatement pstmt = jdbcTemplate.getDataSource().getConnection().prepareStatement(
+                "SELECT * FROM hotel where hotel_name = ?");
+
+        pstmt.setString(1, hotelName);
+
+        ResultSet resultSet = pstmt.executeQuery();
+
+        while (resultSet.next()) {
+            int idHotel = resultSet.getInt(1);
+            String address = resultSet.getString(3);
+            String telephoneNumber = resultSet.getString(4);
+            int category = resultSet.getInt(5);
+            String fax = resultSet.getString(6);
+            String email = resultSet.getString(7);
+            double distanceToAirport = resultSet.getDouble(8);
+            double distanceToNearestCity = resultSet.getDouble(9);
+            int roomsAmount = resultSet.getInt(10);
+            int levelsAmount = resultSet.getInt(11);
+            String localization = resultSet.getString(12);
+            int idChain = resultSet.getInt(13);
+            int idProvince = resultSet.getInt(14);
+
+            HotelChainDto hotelChain = hotelChainService.getHotelChainById(idChain);
+            ProvinceDto province = provinceService.getProvinceById(idProvince);
+
+            hotel = new HotelDto(idHotel, hotelName, address, category, telephoneNumber, fax, email,
+                    distanceToNearestCity, distanceToAirport, roomsAmount, levelsAmount, localization, hotelChain,
+                    province);
+        }
+
+        return hotel;
+    }
 }

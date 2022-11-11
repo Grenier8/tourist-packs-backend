@@ -47,6 +47,16 @@ public class HotelContractDto extends ContractDto {
 		this.idContract = idContract;
 	}
 
+	public HotelContractDto(int idHotelContract2, String contractTitle, String startDate, String endDate,
+			String conciliationDate, int year, String contractDescription2, boolean active2, int idHotel,
+			int idContract) {
+	}
+
+	public HotelContractDto(int idHotelContract2, String contractTitle, LocalDate startDate, LocalDate endDate,
+			LocalDate conciliationDate, int year, String contractDescription2, boolean active2, int idHotel,
+			int idContract) {
+	}
+
 	public int getIdHotelContract() {
 		return this.idHotelContract;
 	}

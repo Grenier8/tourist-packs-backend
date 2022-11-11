@@ -103,3 +103,12 @@ target/classes/cu/edu/cujae/touristpacks/core/dto/MayorDto.class
 target/classes/cu/edu/cujae/touristpacks/core/service/IMayorService.class
 target/classes/cu/edu/cujae/touristpacks/service/MayorServiceImpl.class
 target/test-classes/cu/edu/cujae/touristpacks/TouristPacksBackendApplicationTests.class
+target/classes/cu/edu/cujae/touristpacks/api/controller/DiaryActivityTouristPackController.class
+target/classes/cu/edu/cujae/touristpacks/api/controller/HotelChainController.class
+target/classes/cu/edu/cujae/touristpacks/api/controller/HotelContractController.class
+target/classes/cu/edu/cujae/touristpacks/api/controller/HotelHotelModalityController.class
+target/classes/cu/edu/cujae/touristpacks/api/controller/HotelModalityController.class
+target/classes/cu/edu/cujae/touristpacks/api/controller/ProvinceController.class
+target/classes/cu/edu/cujae/touristpacks/api/controller/RoomPlanSeasonHotelContractController.class
+target/classes/cu/edu/cujae/touristpacks/api/controller/TouristPackController.class
+target/classes/cu/edu/cujae/touristpacks/api/controller/TransportServiceTouristPackController.class

@@ -14,43 +14,43 @@ import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RestController;
 
-import cu.edu.cujae.touristpacks.core.dto.MayorDto;
-import cu.edu.cujae.touristpacks.core.service.IMayorService;
+import cu.edu.cujae.touristpacks.core.dto.ProvinceDto;
+import cu.edu.cujae.touristpacks.core.service.IProvinceService;
 
 @RestController
-@RequestMapping("/api/v1/minors")
-public class MayorController {
+@RequestMapping("/api/v1/provinces")
+public class ProvinceController {
 
     @Autowired
-    private IMayorService minorService;
+    private IProvinceService provinceService;
 
     @GetMapping("/")
-    public ResponseEntity<List<MayorDto>> getAll() throws SQLException {
-        List<MayorDto> list = minorService.getMayors();
+    public ResponseEntity<List<ProvinceDto>> getAll() throws SQLException {
+        List<ProvinceDto> list = provinceService.getProvinces();
         return ResponseEntity.ok(list);
     }
 
     @GetMapping("/{id}")
-    public ResponseEntity<MayorDto> getById(@PathVariable Integer id) throws SQLException {
-        MayorDto minor = minorService.getMayorById(id);
-        return ResponseEntity.ok(minor);
+    public ResponseEntity<ProvinceDto> getById(@PathVariable Integer id) throws SQLException {
+        ProvinceDto province = provinceService.getProvinceById(id);
+        return ResponseEntity.ok(province);
     }
 
     @PostMapping("/")
-    public ResponseEntity<String> create(@RequestBody MayorDto minor) throws SQLException {
-        minorService.createMayor(minor);
-        return ResponseEntity.ok("Mayor Created");
+    public ResponseEntity<String> create(@RequestBody ProvinceDto province) throws SQLException {
+        provinceService.createProvince(province);
+        return ResponseEntity.ok("Province Created");
     }
 
     @PutMapping("/")
-    public ResponseEntity<String> update(@RequestBody MayorDto minor) throws SQLException {
+    public ResponseEntity<String> update(@RequestBody ProvinceDto province) throws SQLException {
         // TODO code for update
-        return ResponseEntity.ok("Mayor Updated");
+        return ResponseEntity.ok("Province Updated");
     }
 
     @DeleteMapping("/{id}")
     public ResponseEntity<String> delete(@PathVariable Integer id) throws SQLException {
-        minorService.deleteMayor(id);
-        return ResponseEntity.ok("Mayor deleted");
+        provinceService.deleteProvince(id);
+        return ResponseEntity.ok("Province deleted");
     }
 }

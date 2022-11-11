@@ -44,6 +44,19 @@ public class TouristPackDto {
 		// inicialateAtributes();
 	}
 
+	public TouristPackDto(int idTouristPack, String promotionalName, int nightsAmount, int paxAmount,
+			double hotelAirportPrice, HotelDto hotel, RoomPlanSeasonDto roomPlanSeason) {
+		this.idTouristPack = idTouristPack;
+		this.promotionalName = promotionalName;
+		this.daysAmount = nightsAmount + 1;
+		this.nightsAmount = nightsAmount;
+		this.paxAmount = paxAmount;
+		this.hotelAirportPrice = hotelAirportPrice;
+		this.hotel = hotel;
+		this.roomPlanSeason = roomPlanSeason;
+
+	}
+
 	// private void inicialateAtributes() {
 	// try {
 	// hotelName = ServicesLocator.getHotelServices().getName(idHotel);

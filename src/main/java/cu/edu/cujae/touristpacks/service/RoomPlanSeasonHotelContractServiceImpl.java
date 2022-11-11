@@ -1,6 +1,11 @@
 package cu.edu.cujae.touristpacks.service;
 
+import java.sql.CallableStatement;
+import java.sql.Connection;
+import java.sql.PreparedStatement;
+import java.sql.ResultSet;
 import java.sql.SQLException;
+import java.sql.Types;
 import java.util.ArrayList;
 import java.util.List;
 
@@ -12,10 +17,14 @@ import cu.edu.cujae.touristpacks.core.service.IRoomPlanSeasonHotelContractServic
 import cu.edu.cujae.touristpacks.core.service.IRoomPlanSeasonService;
 
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.jdbc.core.JdbcTemplate;
 import org.springframework.stereotype.Service;
 
 @Service
 public class RoomPlanSeasonHotelContractServiceImpl implements IRoomPlanSeasonHotelContractService {
+
+    @Autowired
+    private JdbcTemplate jdbcTemplate;
 
     @Autowired
     IRoomPlanSeasonService roomPlanSeasonService;
@@ -27,42 +36,89 @@ public class RoomPlanSeasonHotelContractServiceImpl implements IRoomPlanSeasonHo
     public List<RoomPlanSeasonHotelContractDto> getRoomPlanSeasonHotelContracts() throws SQLException {
         List<RoomPlanSeasonHotelContractDto> list = new ArrayList<>();
 
-        RoomPlanSeasonDto roomPlanSeason1 = roomPlanSeasonService.getRoomPlanSeasons().get(0);
-        RoomPlanSeasonDto roomPlanSeason2 = roomPlanSeasonService.getRoomPlanSeasons().get(1);
+        String function = "{?= call select_all_room_plan_season_hotel_contract()}";
 
-        HotelContractDto hotelContract1 = hotelContractService.getHotelContracts().get(0);
-        HotelContractDto hotelContract2 = hotelContractService.getHotelContracts().get(1);
+        Connection connection = jdbcTemplate.getDataSource().getConnection();
+        connection.setAutoCommit(false);
+        CallableStatement statement = connection.prepareCall(function);
+        statement.registerOutParameter(1, Types.OTHER);
+        statement.execute();
 
-        list.add(new RoomPlanSeasonHotelContractDto(1, roomPlanSeason1, hotelContract1));
-        list.add(new RoomPlanSeasonHotelContractDto(2, roomPlanSeason2, hotelContract2));
+        ResultSet resultSet = (ResultSet) statement.getObject(1);
+
+        while (resultSet.next()) {
+            int id = resultSet.getInt(1);
+            int idHotelContract = resultSet.getInt(2);
+            int idRoomPlanSeason = resultSet.getInt(3);
+
+            HotelContractDto hotelContract = hotelContractService.getHotelContractById(idHotelContract);
+            RoomPlanSeasonDto roomPlanSeason = roomPlanSeasonService.getRoomPlanSeasonById(idRoomPlanSeason);
+
+            RoomPlanSeasonHotelContractDto dto = new RoomPlanSeasonHotelContractDto(id, roomPlanSeason, hotelContract);
+            list.add(dto);
+        }
 
         return list;
     }
 
     @Override
-    public RoomPlanSeasonHotelContractDto getRoomPlanSeasonHotelContractById(int roomPlanSeasonHotelContractId)
+    public RoomPlanSeasonHotelContractDto getRoomPlanSeasonHotelContractById(int idRoomPlanSeasonHotelContract)
             throws SQLException {
-        // TODO Auto-generated method stub
-        return null;
+        RoomPlanSeasonHotelContractDto roomPlanSeasonHotelContract = null;
+
+        PreparedStatement pstmt = jdbcTemplate.getDataSource().getConnection().prepareStatement(
+                "SELECT * FROM room_plan_season_hotel_contract where id_room_plan_season_hotel_contract = ?");
+
+        pstmt.setInt(1, idRoomPlanSeasonHotelContract);
+
+        ResultSet resultSet = pstmt.executeQuery();
+
+        while (resultSet.next()) {
+            int idHotelContract = resultSet.getInt(2);
+            int idRoomPlanSeason = resultSet.getInt(3);
+
+            HotelContractDto hotelContract = hotelContractService.getHotelContractById(idHotelContract);
+            RoomPlanSeasonDto roomPlanSeason = roomPlanSeasonService.getRoomPlanSeasonById(idRoomPlanSeason);
+
+            roomPlanSeasonHotelContract = new RoomPlanSeasonHotelContractDto(idRoomPlanSeasonHotelContract,
+                    roomPlanSeason, hotelContract);
+        }
+
+        return roomPlanSeasonHotelContract;
     }
 
     @Override
     public void createRoomPlanSeasonHotelContract(RoomPlanSeasonHotelContractDto roomPlanSeasonHotelContract)
             throws SQLException {
-        // TODO Auto-generated method stub
 
+        String function = "{call room_plan_season_hotel_contract_insert(?)}";
+
+        CallableStatement statement = jdbcTemplate.getDataSource().getConnection().prepareCall(function);
+        statement.setInt(1, roomPlanSeasonHotelContract.getHotelContract().getIdHotelContract());
+        statement.setInt(2, roomPlanSeasonHotelContract.getRoomPlanSeason().getIdRoomPlanSeason());
+        statement.execute();
     }
 
     @Override
     public void updateRoomPlanSeasonHotelContract(RoomPlanSeasonHotelContractDto roomPlanSeasonHotelContract)
             throws SQLException {
-        // TODO Auto-generated method stub
+        String function = "{call room_plan_season_hotel_contract_update(?,?)}";
+
+        CallableStatement statement = jdbcTemplate.getDataSource().getConnection().prepareCall(function);
+        statement.setInt(1, roomPlanSeasonHotelContract.getIdRoomPlanSeasonHotelContract());
+        statement.setInt(2, roomPlanSeasonHotelContract.getHotelContract().getIdHotelContract());
+        statement.setInt(3, roomPlanSeasonHotelContract.getRoomPlanSeason().getIdRoomPlanSeason());
+        statement.execute();
 
     }
 
     @Override
     public void deleteRoomPlanSeasonHotelContract(int idRoomPlanSeasonHotelContract) throws SQLException {
-        // TODO Auto-generated method stub
+        String function = "{call room_plan_season_hotel_contract_delete(?)}";
+
+        CallableStatement statement = jdbcTemplate.getDataSource().getConnection().prepareCall(function);
+        statement.setInt(1, idRoomPlanSeasonHotelContract);
+        statement.execute();
 
     }
 
