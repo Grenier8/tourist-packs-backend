@@ -44,7 +44,7 @@ public class HotelController {
 
     @PutMapping("/")
     public ResponseEntity<String> update(@RequestBody HotelDto hotel) throws SQLException {
-        // TODO code for update
+        hotelService.updateHotel(hotel);
         return ResponseEntity.ok("Hotel Updated");
     }
 

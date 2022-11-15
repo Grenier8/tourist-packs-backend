@@ -1,6 +1,7 @@
 
 package cu.edu.cujae.touristpacks.service;
 
+import java.util.ArrayList;
 import java.util.List;
 
 import cu.edu.cujae.touristpacks.core.dto.TransportContractDto;
@@ -13,7 +14,7 @@ public class TransportContractServiceImpl implements ITransportContractService {
 
     @Override
     public List<TransportContractDto> getTransportContracts() {
-        return null;
+        return new ArrayList<>();
     }
 
     @Override

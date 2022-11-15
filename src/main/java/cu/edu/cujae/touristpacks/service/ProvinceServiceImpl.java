@@ -51,17 +51,19 @@ public class ProvinceServiceImpl implements IProvinceService {
     public ProvinceDto getProvinceById(int idProvince) throws SQLException {
         ProvinceDto province = null;
 
-        PreparedStatement pstmt = jdbcTemplate.getDataSource().getConnection().prepareStatement(
-                "SELECT * FROM province where id_province = ?");
+        try (Connection connection = jdbcTemplate.getDataSource().getConnection()) {
+            PreparedStatement pstmt = connection.prepareStatement(
+                    "SELECT * FROM province where id_province = ?");
 
-        pstmt.setInt(1, idProvince);
+            pstmt.setInt(1, idProvince);
 
-        ResultSet resultSet = pstmt.executeQuery();
+            ResultSet resultSet = pstmt.executeQuery();
 
-        while (resultSet.next()) {
-            String provinceName = resultSet.getString(2);
+            while (resultSet.next()) {
+                String provinceName = resultSet.getString(2);
 
-            province = new ProvinceDto(idProvince, provinceName);
+                province = new ProvinceDto(idProvince, provinceName);
+            }
         }
 
         return province;

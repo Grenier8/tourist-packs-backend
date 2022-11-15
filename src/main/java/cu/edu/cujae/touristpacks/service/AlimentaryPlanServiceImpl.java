@@ -52,7 +52,7 @@ public class AlimentaryPlanServiceImpl implements IAlimentaryPlanService {
         AlimentaryPlanDto alimentaryPlan = null;
 
         PreparedStatement pstmt = jdbcTemplate.getDataSource().getConnection().prepareStatement(
-                "SELECT * FROM alimentary_plan where id_alimentary_plan = ?");
+                "SELECT * FROM alimentary_plan where id_plan = ?");
 
         pstmt.setInt(1, idAlimentaryPlan);
 

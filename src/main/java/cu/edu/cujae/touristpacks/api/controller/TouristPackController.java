@@ -44,7 +44,7 @@ public class TouristPackController {
 
     @PutMapping("/")
     public ResponseEntity<String> update(@RequestBody TouristPackDto touristPack) throws SQLException {
-        // TODO code for update
+        touristPackService.updateTouristPack(touristPack);
         return ResponseEntity.ok("TouristPack Updated");
     }
 

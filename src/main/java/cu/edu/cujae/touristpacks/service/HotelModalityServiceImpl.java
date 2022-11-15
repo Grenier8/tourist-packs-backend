@@ -51,7 +51,7 @@ public class HotelModalityServiceImpl implements IHotelModalityService {
         HotelModalityDto hotelModality = null;
 
         PreparedStatement pstmt = jdbcTemplate.getDataSource().getConnection().prepareStatement(
-                "SELECT * FROM hotel_modality where id_modality = ?");
+                "SELECT * FROM hotel_modality where id_hotel_modality = ?");
 
         pstmt.setInt(1, idHotelModality);
 
@@ -71,7 +71,7 @@ public class HotelModalityServiceImpl implements IHotelModalityService {
         HotelModalityDto hotelModality = null;
 
         PreparedStatement pstmt = jdbcTemplate.getDataSource().getConnection().prepareStatement(
-                "SELECT * FROM hotel_modality where modality_name = ?");
+                "SELECT * FROM hotel_modality where hotel_modality_name = ?");
 
         pstmt.setString(1, hotelModalityName);
 

@@ -51,17 +51,19 @@ public class HotelChainServiceImpl implements IHotelChainService {
     public HotelChainDto getHotelChainById(int hotelChainId) throws SQLException {
         HotelChainDto hotelChain = null;
 
-        PreparedStatement pstmt = jdbcTemplate.getDataSource().getConnection().prepareStatement(
-                "SELECT * FROM hotel_chain where id_chain = ?");
+        try (Connection connection = jdbcTemplate.getDataSource().getConnection()) {
+            PreparedStatement pstmt = connection.prepareStatement(
+                    "SELECT * FROM hotel_chain where id_chain = ?");
 
-        pstmt.setInt(1, hotelChainId);
+            pstmt.setInt(1, hotelChainId);
 
-        ResultSet resultSet = pstmt.executeQuery();
+            ResultSet resultSet = pstmt.executeQuery();
 
-        while (resultSet.next()) {
-            String hotelChainName = resultSet.getString(2);
+            while (resultSet.next()) {
+                String hotelChainName = resultSet.getString(2);
 
-            hotelChain = new HotelChainDto(hotelChainId, hotelChainName);
+                hotelChain = new HotelChainDto(hotelChainId, hotelChainName);
+            }
         }
 
         return hotelChain;

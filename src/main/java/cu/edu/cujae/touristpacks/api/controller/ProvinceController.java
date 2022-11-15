@@ -44,7 +44,7 @@ public class ProvinceController {
 
     @PutMapping("/")
     public ResponseEntity<String> update(@RequestBody ProvinceDto province) throws SQLException {
-        // TODO code for update
+        provinceService.updateProvince(province);
         return ResponseEntity.ok("Province Updated");
     }
 

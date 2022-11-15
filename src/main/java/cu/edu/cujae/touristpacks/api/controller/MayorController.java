@@ -44,7 +44,7 @@ public class MayorController {
 
     @PutMapping("/")
     public ResponseEntity<String> update(@RequestBody MayorDto minor) throws SQLException {
-        // TODO code for update
+        minorService.updateMayor(minor);
         return ResponseEntity.ok("Mayor Updated");
     }
 

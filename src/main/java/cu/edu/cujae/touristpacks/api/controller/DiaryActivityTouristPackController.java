@@ -47,7 +47,7 @@ public class DiaryActivityTouristPackController {
     @PutMapping("/")
     public ResponseEntity<String> update(@RequestBody DiaryActivityTouristPackDto diaryActivityTouristPack)
             throws SQLException {
-        // TODO code for update
+        diaryActivityTouristPackService.updateDiaryActivityTouristPack(diaryActivityTouristPack);
         return ResponseEntity.ok("DiaryActivityTouristPack Updated");
     }
 
