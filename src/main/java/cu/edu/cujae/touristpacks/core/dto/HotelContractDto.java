@@ -13,48 +13,20 @@ public class HotelContractDto extends ContractDto {
 
 	}
 
-	public HotelContractDto(String contractTitle, LocalDate startDate, LocalDate endDate, LocalDate conciliationDate,
-			String contractDescription, HotelDto hotel, int idContract) {
-		super(contractTitle, startDate, endDate, conciliationDate);
-		this.contractDescription = contractDescription;
-		this.hotel = hotel;
-		this.idContract = idContract;
-	}
-
-	public HotelContractDto(String contractTitle, LocalDate startDate, LocalDate endDate, LocalDate conciliationDate,
-			String contractDescription, HotelDto hotel) {
-		super(contractTitle, startDate, endDate, conciliationDate);
-		this.contractDescription = contractDescription;
-		this.hotel = hotel;
-	}
-
-	public HotelContractDto(int idHotelContract, String contractTitle, LocalDate startDate, LocalDate endDate,
+	public HotelContractDto(int idContract, String contractTitle, LocalDate startDate, LocalDate endDate,
 			LocalDate conciliationDate,
 			String contractDescription, HotelDto hotel) {
-		super(contractTitle, startDate, endDate, conciliationDate);
-		this.idHotelContract = idHotelContract;
+		super(idContract, contractTitle, startDate, endDate, conciliationDate);
 		this.contractDescription = contractDescription;
 		this.hotel = hotel;
 	}
 
-	public HotelContractDto(int idHotelContract, String contractTitle, LocalDate startDate, LocalDate endDate,
+	public HotelContractDto(int idHotelContract, int idContract, String contractTitle, LocalDate startDate,
+			LocalDate endDate,
 			LocalDate conciliationDate,
-			String contractDescription, HotelDto hotel, int idContract) {
-		super(contractTitle, startDate, endDate, conciliationDate);
+			String contractDescription, HotelDto hotel) {
+		this(idContract, contractTitle, startDate, endDate, conciliationDate, contractDescription, hotel);
 		this.idHotelContract = idHotelContract;
-		this.contractDescription = contractDescription;
-		this.hotel = hotel;
-		this.idContract = idContract;
-	}
-
-	public HotelContractDto(int idHotelContract2, String contractTitle, String startDate, String endDate,
-			String conciliationDate, int year, String contractDescription2, boolean active2, int idHotel,
-			int idContract) {
-	}
-
-	public HotelContractDto(int idHotelContract2, String contractTitle, LocalDate startDate, LocalDate endDate,
-			LocalDate conciliationDate, int year, String contractDescription2, boolean active2, int idHotel,
-			int idContract) {
 	}
 
 	public int getIdHotelContract() {

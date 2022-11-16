@@ -36,28 +36,28 @@ public class DiaryActivityTouristPackServiceImpl implements IDiaryActivityTouris
     public List<DiaryActivityTouristPackDto> getDiaryActivityTouristPacks() throws SQLException {
         List<DiaryActivityTouristPackDto> list = new ArrayList<>();
 
-        String function = "{?= call select_all_diary_activity_tourist_pack()}";
+        String function = "{?= call select_all_diary_activity_turist_pack()}";
 
-        Connection connection = jdbcTemplate.getDataSource().getConnection();
-        connection.setAutoCommit(false);
-        CallableStatement statement = connection.prepareCall(function);
-        statement.registerOutParameter(1, Types.OTHER);
-        statement.execute();
+        try (Connection connection = jdbcTemplate.getDataSource().getConnection()) {
+            connection.setAutoCommit(false);
+            CallableStatement statement = connection.prepareCall(function);
+            statement.registerOutParameter(1, Types.OTHER);
+            statement.execute();
 
-        ResultSet resultSet = (ResultSet) statement.getObject(1);
+            ResultSet resultSet = (ResultSet) statement.getObject(1);
 
-        while (resultSet.next()) {
-            int id = resultSet.getInt(1);
-            int idActivity = resultSet.getInt(2);
-            int idPack = resultSet.getInt(3);
+            while (resultSet.next()) {
+                int id = resultSet.getInt(1);
+                int idActivity = resultSet.getInt(2);
+                int idPack = resultSet.getInt(3);
 
-            DiaryActivityDto diaryActivity = diaryActivityService.getDiaryActivityById(idActivity);
-            TouristPackDto touristPack = touristPackService.getTouristPackById(idPack);
+                DiaryActivityDto diaryActivity = diaryActivityService.getDiaryActivityById(idActivity);
+                TouristPackDto touristPack = touristPackService.getTouristPackById(idPack);
 
-            DiaryActivityTouristPackDto dto = new DiaryActivityTouristPackDto(id, diaryActivity, touristPack);
-            list.add(dto);
+                DiaryActivityTouristPackDto dto = new DiaryActivityTouristPackDto(id, diaryActivity, touristPack);
+                list.add(dto);
+            }
         }
-
         return list;
     }
 
@@ -66,22 +66,24 @@ public class DiaryActivityTouristPackServiceImpl implements IDiaryActivityTouris
             throws SQLException {
         DiaryActivityTouristPackDto diaryActivityTouristPack = null;
 
-        PreparedStatement pstmt = jdbcTemplate.getDataSource().getConnection().prepareStatement(
-                "SELECT * FROM diary_activity_turist_pack where id_diary_activity_turist_pack = ?");
+        try (Connection connection = jdbcTemplate.getDataSource().getConnection()) {
+            PreparedStatement pstmt = connection.prepareStatement(
+                    "SELECT * FROM diary_activity_turist_pack where id_diary_activity_turist_pack = ?");
 
-        pstmt.setInt(1, idDiaryActivityTouristPack);
+            pstmt.setInt(1, idDiaryActivityTouristPack);
 
-        ResultSet resultSet = pstmt.executeQuery();
+            ResultSet resultSet = pstmt.executeQuery();
 
-        while (resultSet.next()) {
-            int idDiaryActivity = resultSet.getInt(2);
-            int idTouristPack = resultSet.getInt(3);
+            while (resultSet.next()) {
+                int idDiaryActivity = resultSet.getInt(2);
+                int idTouristPack = resultSet.getInt(3);
 
-            DiaryActivityDto diaryActivity = diaryActivityService.getDiaryActivityById(idDiaryActivity);
-            TouristPackDto touristPack = touristPackService.getTouristPackById(idTouristPack);
+                DiaryActivityDto diaryActivity = diaryActivityService.getDiaryActivityById(idDiaryActivity);
+                TouristPackDto touristPack = touristPackService.getTouristPackById(idTouristPack);
 
-            diaryActivityTouristPack = new DiaryActivityTouristPackDto(idDiaryActivityTouristPack, diaryActivity,
-                    touristPack);
+                diaryActivityTouristPack = new DiaryActivityTouristPackDto(idDiaryActivityTouristPack, diaryActivity,
+                        touristPack);
+            }
         }
 
         return diaryActivityTouristPack;
@@ -90,25 +92,29 @@ public class DiaryActivityTouristPackServiceImpl implements IDiaryActivityTouris
     @Override
     public void createDiaryActivityTouristPack(DiaryActivityTouristPackDto diaryActivityTouristPack)
             throws SQLException {
-        String function = "{call diary_activity_turist_pack_insert(?)}";
+        String function = "{call diary_activity_turist_pack_insert(?,?)}";
 
-        CallableStatement statement = jdbcTemplate.getDataSource().getConnection().prepareCall(function);
-        statement.setInt(1, diaryActivityTouristPack.getDiaryActivity().getIdDiaryActivity());
-        statement.setInt(2, diaryActivityTouristPack.getTouristPack().getIdTouristPack());
-        statement.execute();
+        try (Connection connection = jdbcTemplate.getDataSource().getConnection()) {
+            CallableStatement statement = connection.prepareCall(function);
+            statement.setInt(1, diaryActivityTouristPack.getDiaryActivity().getIdDiaryActivity());
+            statement.setInt(2, diaryActivityTouristPack.getTouristPack().getIdTouristPack());
+            statement.execute();
+        }
 
     }
 
     @Override
     public void updateDiaryActivityTouristPack(DiaryActivityTouristPackDto diaryActivityTouristPack)
             throws SQLException {
-        String function = "{call diary_activity_turist_pack_update(?,?)}";
+        String function = "{call diary_activity_turist_pack_update(?,?,?)}";
 
-        CallableStatement statement = jdbcTemplate.getDataSource().getConnection().prepareCall(function);
-        statement.setInt(1, diaryActivityTouristPack.getIdDiaryActivityTouristPack());
-        statement.setInt(2, diaryActivityTouristPack.getDiaryActivity().getIdDiaryActivity());
-        statement.setInt(3, diaryActivityTouristPack.getTouristPack().getIdTouristPack());
-        statement.execute();
+        try (Connection connection = jdbcTemplate.getDataSource().getConnection()) {
+            CallableStatement statement = connection.prepareCall(function);
+            statement.setInt(1, diaryActivityTouristPack.getIdDiaryActivityTouristPack());
+            statement.setInt(2, diaryActivityTouristPack.getDiaryActivity().getIdDiaryActivity());
+            statement.setInt(3, diaryActivityTouristPack.getTouristPack().getIdTouristPack());
+            statement.execute();
+        }
 
     }
 
@@ -116,9 +122,11 @@ public class DiaryActivityTouristPackServiceImpl implements IDiaryActivityTouris
     public void deleteDiaryActivityTouristPack(int idDiaryActivityTouristPack) throws SQLException {
         String function = "{call diary_activity_turist_pack_delete(?)}";
 
-        CallableStatement statement = jdbcTemplate.getDataSource().getConnection().prepareCall(function);
-        statement.setInt(1, idDiaryActivityTouristPack);
-        statement.execute();
+        try (Connection connection = jdbcTemplate.getDataSource().getConnection()) {
+            CallableStatement statement = connection.prepareCall(function);
+            statement.setInt(1, idDiaryActivityTouristPack);
+            statement.execute();
+        }
 
     }
 

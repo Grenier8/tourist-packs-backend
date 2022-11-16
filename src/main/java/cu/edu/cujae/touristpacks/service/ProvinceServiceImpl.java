@@ -28,20 +28,21 @@ public class ProvinceServiceImpl implements IProvinceService {
 
         String function = "{?= call select_all_province()}";
 
-        Connection connection = jdbcTemplate.getDataSource().getConnection();
-        connection.setAutoCommit(false);
-        CallableStatement statement = connection.prepareCall(function);
-        statement.registerOutParameter(1, Types.OTHER);
-        statement.execute();
+        try (Connection connection = jdbcTemplate.getDataSource().getConnection()) {
+            connection.setAutoCommit(false);
+            CallableStatement statement = connection.prepareCall(function);
+            statement.registerOutParameter(1, Types.OTHER);
+            statement.execute();
 
-        ResultSet resultSet = (ResultSet) statement.getObject(1);
+            ResultSet resultSet = (ResultSet) statement.getObject(1);
 
-        while (resultSet.next()) {
-            int idProvince = resultSet.getInt(1);
-            String provinceName = resultSet.getString(2);
+            while (resultSet.next()) {
+                int idProvince = resultSet.getInt(1);
+                String provinceName = resultSet.getString(2);
 
-            ProvinceDto dto = new ProvinceDto(idProvince, provinceName);
-            list.add(dto);
+                ProvinceDto dto = new ProvinceDto(idProvince, provinceName);
+                list.add(dto);
+            }
         }
 
         return list;
@@ -73,9 +74,11 @@ public class ProvinceServiceImpl implements IProvinceService {
     public void createProvince(ProvinceDto province) throws SQLException {
         String function = "{call province_insert(?)}";
 
-        CallableStatement statement = jdbcTemplate.getDataSource().getConnection().prepareCall(function);
-        statement.setString(1, province.getProvinceName());
-        statement.execute();
+        try (Connection connection = jdbcTemplate.getDataSource().getConnection()) {
+            CallableStatement statement = connection.prepareCall(function);
+            statement.setString(1, province.getProvinceName());
+            statement.execute();
+        }
 
     }
 
@@ -83,10 +86,12 @@ public class ProvinceServiceImpl implements IProvinceService {
     public void updateProvince(ProvinceDto province) throws SQLException {
         String function = "{call province_update(?,?)}";
 
-        CallableStatement statement = jdbcTemplate.getDataSource().getConnection().prepareCall(function);
-        statement.setInt(1, province.getIdProvince());
-        statement.setString(2, province.getProvinceName());
-        statement.execute();
+        try (Connection connection = jdbcTemplate.getDataSource().getConnection()) {
+            CallableStatement statement = connection.prepareCall(function);
+            statement.setInt(1, province.getIdProvince());
+            statement.setString(2, province.getProvinceName());
+            statement.execute();
+        }
 
     }
 
@@ -94,9 +99,11 @@ public class ProvinceServiceImpl implements IProvinceService {
     public void deleteProvince(int idHotelChain) throws SQLException {
         String function = "{call province_delete(?)}";
 
-        CallableStatement statement = jdbcTemplate.getDataSource().getConnection().prepareCall(function);
-        statement.setInt(1, idHotelChain);
-        statement.execute();
+        try (Connection connection = jdbcTemplate.getDataSource().getConnection()) {
+            CallableStatement statement = connection.prepareCall(function);
+            statement.setInt(1, idHotelChain);
+            statement.execute();
+        }
 
     }
 
@@ -104,19 +111,20 @@ public class ProvinceServiceImpl implements IProvinceService {
     public ProvinceDto getProvinceByName(String provinceName) throws SQLException {
         ProvinceDto province = null;
 
-        PreparedStatement pstmt = jdbcTemplate.getDataSource().getConnection().prepareStatement(
-                "SELECT * FROM province where province_name = ?");
+        try (Connection connection = jdbcTemplate.getDataSource().getConnection()) {
+            PreparedStatement pstmt = connection.prepareStatement(
+                    "SELECT * FROM province where province_name = ?");
 
-        pstmt.setString(1, provinceName);
+            pstmt.setString(1, provinceName);
 
-        ResultSet resultSet = pstmt.executeQuery();
+            ResultSet resultSet = pstmt.executeQuery();
 
-        while (resultSet.next()) {
-            int idProvince = resultSet.getInt(2);
+            while (resultSet.next()) {
+                int idProvince = resultSet.getInt(2);
 
-            province = new ProvinceDto(idProvince, provinceName);
+                province = new ProvinceDto(idProvince, provinceName);
+            }
         }
-
         return province;
     }
 }

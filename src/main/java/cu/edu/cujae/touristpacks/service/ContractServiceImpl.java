@@ -30,24 +30,25 @@ public class ContractServiceImpl implements IContractService {
 
         String function = "{?= call select_all_contract()}";
 
-        Connection connection = jdbcTemplate.getDataSource().getConnection();
-        connection.setAutoCommit(false);
-        CallableStatement statement = connection.prepareCall(function);
-        statement.registerOutParameter(1, Types.OTHER);
-        statement.execute();
+        try (Connection connection = jdbcTemplate.getDataSource().getConnection()) {
+            connection.setAutoCommit(false);
+            CallableStatement statement = connection.prepareCall(function);
+            statement.registerOutParameter(1, Types.OTHER);
+            statement.execute();
 
-        ResultSet resultSet = (ResultSet) statement.getObject(1);
+            ResultSet resultSet = (ResultSet) statement.getObject(1);
 
-        while (resultSet.next()) {
-            int idContract = resultSet.getInt(1);
-            LocalDate startDate = resultSet.getDate(2).toLocalDate();
-            LocalDate endDate = resultSet.getDate(3).toLocalDate();
-            LocalDate conciliationDate = resultSet.getDate(4).toLocalDate();
-            int year = resultSet.getInt(5);
-            String contractTitle = resultSet.getString(6);
+            while (resultSet.next()) {
+                int idContract = resultSet.getInt(1);
+                LocalDate startDate = resultSet.getDate(2).toLocalDate();
+                LocalDate endDate = resultSet.getDate(3).toLocalDate();
+                LocalDate conciliationDate = resultSet.getDate(4).toLocalDate();
+                int year = resultSet.getInt(5);
+                String contractTitle = resultSet.getString(6);
 
-            ContractDto dto = new ContractDto(idContract, contractTitle, startDate, endDate, conciliationDate);
-            list.add(dto);
+                ContractDto dto = new ContractDto(idContract, contractTitle, startDate, endDate, conciliationDate);
+                list.add(dto);
+            }
         }
 
         return list;
@@ -57,21 +58,23 @@ public class ContractServiceImpl implements IContractService {
     public ContractDto getContractById(int idContract) throws SQLException {
         ContractDto contract = null;
 
-        PreparedStatement pstmt = jdbcTemplate.getDataSource().getConnection().prepareStatement(
-                "SELECT * FROM contract where id_contract = ?");
+        try (Connection connection = jdbcTemplate.getDataSource().getConnection()) {
+            PreparedStatement pstmt = connection.prepareStatement(
+                    "SELECT * FROM contract where id_contract = ?");
 
-        pstmt.setInt(1, idContract);
+            pstmt.setInt(1, idContract);
 
-        ResultSet resultSet = pstmt.executeQuery();
+            ResultSet resultSet = pstmt.executeQuery();
 
-        while (resultSet.next()) {
-            LocalDate startDate = resultSet.getDate(2).toLocalDate();
-            LocalDate endDate = resultSet.getDate(3).toLocalDate();
-            LocalDate conciliationDate = resultSet.getDate(4).toLocalDate();
-            int year = resultSet.getInt(5);
-            String contractTitle = resultSet.getString(6);
+            while (resultSet.next()) {
+                LocalDate startDate = resultSet.getDate(2).toLocalDate();
+                LocalDate endDate = resultSet.getDate(3).toLocalDate();
+                LocalDate conciliationDate = resultSet.getDate(4).toLocalDate();
+                int year = resultSet.getInt(5);
+                String contractTitle = resultSet.getString(6);
 
-            contract = new ContractDto(idContract, contractTitle, startDate, endDate, conciliationDate);
+                contract = new ContractDto(idContract, contractTitle, startDate, endDate, conciliationDate);
+            }
         }
 
         return contract;
@@ -81,21 +84,23 @@ public class ContractServiceImpl implements IContractService {
     public ContractDto getContractByTitle(String contractTitle) throws SQLException {
         ContractDto contract = null;
 
-        PreparedStatement pstmt = jdbcTemplate.getDataSource().getConnection().prepareStatement(
-                "SELECT * FROM contract where contract_title = ?");
+        try (Connection connection = jdbcTemplate.getDataSource().getConnection()) {
+            PreparedStatement pstmt = connection.prepareStatement(
+                    "SELECT * FROM contract where contract_title = ?");
 
-        pstmt.setString(1, contractTitle);
+            pstmt.setString(1, contractTitle);
 
-        ResultSet resultSet = pstmt.executeQuery();
+            ResultSet resultSet = pstmt.executeQuery();
 
-        while (resultSet.next()) {
-            int idContract = resultSet.getInt(1);
-            LocalDate startDate = resultSet.getDate(2).toLocalDate();
-            LocalDate endDate = resultSet.getDate(3).toLocalDate();
-            LocalDate conciliationDate = resultSet.getDate(4).toLocalDate();
-            int year = resultSet.getInt(5);
+            while (resultSet.next()) {
+                int idContract = resultSet.getInt(1);
+                LocalDate startDate = resultSet.getDate(2).toLocalDate();
+                LocalDate endDate = resultSet.getDate(3).toLocalDate();
+                LocalDate conciliationDate = resultSet.getDate(4).toLocalDate();
+                int year = resultSet.getInt(5);
 
-            contract = new ContractDto(idContract, contractTitle, startDate, endDate, conciliationDate);
+                contract = new ContractDto(idContract, contractTitle, startDate, endDate, conciliationDate);
+            }
         }
 
         return contract;
@@ -105,13 +110,15 @@ public class ContractServiceImpl implements IContractService {
     public void createContract(ContractDto contract) throws SQLException {
         String function = "{call contract_insert(?,?,?,?,?)}";
 
-        CallableStatement statement = jdbcTemplate.getDataSource().getConnection().prepareCall(function);
-        statement.setDate(1, Date.valueOf(contract.getStartDate()));
-        statement.setDate(2, Date.valueOf(contract.getEndDate()));
-        statement.setDate(3, Date.valueOf(contract.getConciliationDate()));
-        statement.setInt(4, contract.getConciliationDate().getYear());
-        statement.setString(5, contract.getContractTitle());
-        statement.execute();
+        try (Connection connection = jdbcTemplate.getDataSource().getConnection()) {
+            CallableStatement statement = connection.prepareCall(function);
+            statement.setDate(1, Date.valueOf(contract.getStartDate()));
+            statement.setDate(2, Date.valueOf(contract.getEndDate()));
+            statement.setDate(3, Date.valueOf(contract.getConciliationDate()));
+            statement.setInt(4, contract.getConciliationDate().getYear());
+            statement.setString(5, contract.getContractTitle());
+            statement.execute();
+        }
 
     }
 
@@ -119,14 +126,16 @@ public class ContractServiceImpl implements IContractService {
     public void updateContract(ContractDto contract) throws SQLException {
         String function = "{call contract_update(?,?,?,?,?,?)}";
 
-        CallableStatement statement = jdbcTemplate.getDataSource().getConnection().prepareCall(function);
-        statement.setInt(1, contract.getIdContract());
-        statement.setDate(2, Date.valueOf(contract.getStartDate()));
-        statement.setDate(3, Date.valueOf(contract.getEndDate()));
-        statement.setDate(4, Date.valueOf(contract.getConciliationDate()));
-        statement.setInt(5, contract.getConciliationDate().getYear());
-        statement.setString(6, contract.getContractTitle());
-        statement.execute();
+        try (Connection connection = jdbcTemplate.getDataSource().getConnection()) {
+            CallableStatement statement = connection.prepareCall(function);
+            statement.setInt(1, contract.getIdContract());
+            statement.setDate(2, Date.valueOf(contract.getStartDate()));
+            statement.setDate(3, Date.valueOf(contract.getEndDate()));
+            statement.setDate(4, Date.valueOf(contract.getConciliationDate()));
+            statement.setInt(5, contract.getConciliationDate().getYear());
+            statement.setString(6, contract.getContractTitle());
+            statement.execute();
+        }
 
     }
 
@@ -134,9 +143,11 @@ public class ContractServiceImpl implements IContractService {
     public void deleteContract(int idContract) throws SQLException {
         String function = "{call contract_delete(?)}";
 
-        CallableStatement statement = jdbcTemplate.getDataSource().getConnection().prepareCall(function);
-        statement.setInt(1, idContract);
-        statement.execute();
+        try (Connection connection = jdbcTemplate.getDataSource().getConnection()) {
+            CallableStatement statement = connection.prepareCall(function);
+            statement.setInt(1, idContract);
+            statement.execute();
+        }
 
     }
 

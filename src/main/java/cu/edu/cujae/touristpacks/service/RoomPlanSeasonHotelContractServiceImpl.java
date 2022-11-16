@@ -38,24 +38,26 @@ public class RoomPlanSeasonHotelContractServiceImpl implements IRoomPlanSeasonHo
 
         String function = "{?= call select_all_room_plan_season_hotel_contract()}";
 
-        Connection connection = jdbcTemplate.getDataSource().getConnection();
-        connection.setAutoCommit(false);
-        CallableStatement statement = connection.prepareCall(function);
-        statement.registerOutParameter(1, Types.OTHER);
-        statement.execute();
+        try (Connection connection = jdbcTemplate.getDataSource().getConnection()) {
+            connection.setAutoCommit(false);
+            CallableStatement statement = connection.prepareCall(function);
+            statement.registerOutParameter(1, Types.OTHER);
+            statement.execute();
 
-        ResultSet resultSet = (ResultSet) statement.getObject(1);
+            ResultSet resultSet = (ResultSet) statement.getObject(1);
 
-        while (resultSet.next()) {
-            int id = resultSet.getInt(1);
-            int idHotelContract = resultSet.getInt(2);
-            int idRoomPlanSeason = resultSet.getInt(3);
+            while (resultSet.next()) {
+                int id = resultSet.getInt(1);
+                int idHotelContract = resultSet.getInt(2);
+                int idRoomPlanSeason = resultSet.getInt(3);
 
-            HotelContractDto hotelContract = hotelContractService.getHotelContractById(idHotelContract);
-            RoomPlanSeasonDto roomPlanSeason = roomPlanSeasonService.getRoomPlanSeasonById(idRoomPlanSeason);
+                HotelContractDto hotelContract = hotelContractService.getHotelContractById(idHotelContract);
+                RoomPlanSeasonDto roomPlanSeason = roomPlanSeasonService.getRoomPlanSeasonById(idRoomPlanSeason);
 
-            RoomPlanSeasonHotelContractDto dto = new RoomPlanSeasonHotelContractDto(id, roomPlanSeason, hotelContract);
-            list.add(dto);
+                RoomPlanSeasonHotelContractDto dto = new RoomPlanSeasonHotelContractDto(id, roomPlanSeason,
+                        hotelContract);
+                list.add(dto);
+            }
         }
 
         return list;
@@ -66,22 +68,24 @@ public class RoomPlanSeasonHotelContractServiceImpl implements IRoomPlanSeasonHo
             throws SQLException {
         RoomPlanSeasonHotelContractDto roomPlanSeasonHotelContract = null;
 
-        PreparedStatement pstmt = jdbcTemplate.getDataSource().getConnection().prepareStatement(
-                "SELECT * FROM room_plan_season_hotel_contract where id_room_plan_season_hotel_contract = ?");
+        try (Connection connection = jdbcTemplate.getDataSource().getConnection()) {
+            PreparedStatement pstmt = connection.prepareStatement(
+                    "SELECT * FROM room_plan_season_hotel_contract where id_room_plan_season_hotel_contract = ?");
 
-        pstmt.setInt(1, idRoomPlanSeasonHotelContract);
+            pstmt.setInt(1, idRoomPlanSeasonHotelContract);
 
-        ResultSet resultSet = pstmt.executeQuery();
+            ResultSet resultSet = pstmt.executeQuery();
 
-        while (resultSet.next()) {
-            int idHotelContract = resultSet.getInt(2);
-            int idRoomPlanSeason = resultSet.getInt(3);
+            while (resultSet.next()) {
+                int idHotelContract = resultSet.getInt(2);
+                int idRoomPlanSeason = resultSet.getInt(3);
 
-            HotelContractDto hotelContract = hotelContractService.getHotelContractById(idHotelContract);
-            RoomPlanSeasonDto roomPlanSeason = roomPlanSeasonService.getRoomPlanSeasonById(idRoomPlanSeason);
+                HotelContractDto hotelContract = hotelContractService.getHotelContractById(idHotelContract);
+                RoomPlanSeasonDto roomPlanSeason = roomPlanSeasonService.getRoomPlanSeasonById(idRoomPlanSeason);
 
-            roomPlanSeasonHotelContract = new RoomPlanSeasonHotelContractDto(idRoomPlanSeasonHotelContract,
-                    roomPlanSeason, hotelContract);
+                roomPlanSeasonHotelContract = new RoomPlanSeasonHotelContractDto(idRoomPlanSeasonHotelContract,
+                        roomPlanSeason, hotelContract);
+            }
         }
 
         return roomPlanSeasonHotelContract;
@@ -91,24 +95,28 @@ public class RoomPlanSeasonHotelContractServiceImpl implements IRoomPlanSeasonHo
     public void createRoomPlanSeasonHotelContract(RoomPlanSeasonHotelContractDto roomPlanSeasonHotelContract)
             throws SQLException {
 
-        String function = "{call room_plan_season_hotel_contract_insert(?)}";
+        String function = "{call room_plan_season_hotel_contract_insert(?,?)}";
 
-        CallableStatement statement = jdbcTemplate.getDataSource().getConnection().prepareCall(function);
-        statement.setInt(1, roomPlanSeasonHotelContract.getHotelContract().getIdHotelContract());
-        statement.setInt(2, roomPlanSeasonHotelContract.getRoomPlanSeason().getIdRoomPlanSeason());
-        statement.execute();
+        try (Connection connection = jdbcTemplate.getDataSource().getConnection()) {
+            CallableStatement statement = connection.prepareCall(function);
+            statement.setInt(1, roomPlanSeasonHotelContract.getHotelContract().getIdHotelContract());
+            statement.setInt(2, roomPlanSeasonHotelContract.getRoomPlanSeason().getIdRoomPlanSeason());
+            statement.execute();
+        }
     }
 
     @Override
     public void updateRoomPlanSeasonHotelContract(RoomPlanSeasonHotelContractDto roomPlanSeasonHotelContract)
             throws SQLException {
-        String function = "{call room_plan_season_hotel_contract_update(?,?)}";
+        String function = "{call room_plan_season_hotel_contract_update(?,?,?)}";
 
-        CallableStatement statement = jdbcTemplate.getDataSource().getConnection().prepareCall(function);
-        statement.setInt(1, roomPlanSeasonHotelContract.getIdRoomPlanSeasonHotelContract());
-        statement.setInt(2, roomPlanSeasonHotelContract.getHotelContract().getIdHotelContract());
-        statement.setInt(3, roomPlanSeasonHotelContract.getRoomPlanSeason().getIdRoomPlanSeason());
-        statement.execute();
+        try (Connection connection = jdbcTemplate.getDataSource().getConnection()) {
+            CallableStatement statement = connection.prepareCall(function);
+            statement.setInt(1, roomPlanSeasonHotelContract.getIdRoomPlanSeasonHotelContract());
+            statement.setInt(2, roomPlanSeasonHotelContract.getHotelContract().getIdHotelContract());
+            statement.setInt(3, roomPlanSeasonHotelContract.getRoomPlanSeason().getIdRoomPlanSeason());
+            statement.execute();
+        }
 
     }
 
@@ -116,9 +124,11 @@ public class RoomPlanSeasonHotelContractServiceImpl implements IRoomPlanSeasonHo
     public void deleteRoomPlanSeasonHotelContract(int idRoomPlanSeasonHotelContract) throws SQLException {
         String function = "{call room_plan_season_hotel_contract_delete(?)}";
 
-        CallableStatement statement = jdbcTemplate.getDataSource().getConnection().prepareCall(function);
-        statement.setInt(1, idRoomPlanSeasonHotelContract);
-        statement.execute();
+        try (Connection connection = jdbcTemplate.getDataSource().getConnection()) {
+            CallableStatement statement = connection.prepareCall(function);
+            statement.setInt(1, idRoomPlanSeasonHotelContract);
+            statement.execute();
+        }
 
     }
 

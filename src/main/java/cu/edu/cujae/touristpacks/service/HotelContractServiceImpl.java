@@ -39,33 +39,36 @@ public class HotelContractServiceImpl implements IHotelContractService {
 
         String function = "{?= call select_all_hotel_contract()}";
 
-        Connection connection = jdbcTemplate.getDataSource().getConnection();
-        connection.setAutoCommit(false);
-        CallableStatement statement = connection.prepareCall(function);
-        statement.registerOutParameter(1, Types.OTHER);
-        statement.execute();
+        try (Connection connection = jdbcTemplate.getDataSource().getConnection()) {
+            connection.setAutoCommit(false);
+            CallableStatement statement = connection.prepareCall(function);
+            statement.registerOutParameter(1, Types.OTHER);
+            statement.execute();
 
-        ResultSet resultSet = (ResultSet) statement.getObject(1);
+            ResultSet resultSet = (ResultSet) statement.getObject(1);
 
-        while (resultSet.next()) {
-            int idHotelContract = resultSet.getInt(1);
-            String contractDescription = resultSet.getString(2);
-            boolean active = resultSet.getBoolean(3);
-            int idHotel = resultSet.getInt(4);
-            int idContract = resultSet.getInt(5);
+            while (resultSet.next()) {
+                int idHotelContract = resultSet.getInt(1);
+                String contractDescription = resultSet.getString(2);
+                boolean active = resultSet.getBoolean(3);
+                int idHotel = resultSet.getInt(4);
+                int idContract = resultSet.getInt(5);
 
-            ContractDto contract = contractService.getContractById(idContract);
+                HotelDto hotel = hotelService.getHotelById(idHotel);
+                ContractDto contract = contractService.getContractById(idContract);
 
-            String contractTitle = contract.getContractTitle();
-            LocalDate startDate = contract.getStartDate();
-            LocalDate endDate = contract.getEndDate();
-            LocalDate conciliationDate = contract.getConciliationDate();
-            int year = conciliationDate.getYear();
+                String contractTitle = contract.getContractTitle();
+                LocalDate startDate = contract.getStartDate();
+                LocalDate endDate = contract.getEndDate();
+                LocalDate conciliationDate = contract.getConciliationDate();
+                int year = conciliationDate.getYear();
 
-            HotelContractDto hotelContract = new HotelContractDto(idHotelContract, contractTitle, startDate, endDate,
-                    conciliationDate, year, contractDescription, active, idHotel, idContract);
+                HotelContractDto hotelContract = new HotelContractDto(idHotelContract, idContract, contractTitle,
+                        startDate,
+                        endDate, conciliationDate, contractDescription, hotel);
 
-            list.add(hotelContract);
+                list.add(hotelContract);
+            }
         }
 
         return list;
@@ -75,29 +78,32 @@ public class HotelContractServiceImpl implements IHotelContractService {
     public HotelContractDto getHotelContractById(int idHotelContract) throws SQLException {
         HotelContractDto hotelContract = null;
 
-        PreparedStatement pstmt = jdbcTemplate.getDataSource().getConnection().prepareStatement(
-                "SELECT * FROM hotel_contract where id_hotel_contract = ?");
+        try (Connection connection = jdbcTemplate.getDataSource().getConnection()) {
+            PreparedStatement pstmt = connection.prepareStatement(
+                    "SELECT * FROM hotel_contract where id_hotel_contract = ?");
 
-        pstmt.setInt(1, idHotelContract);
+            pstmt.setInt(1, idHotelContract);
 
-        ResultSet resultSet = pstmt.executeQuery();
+            ResultSet resultSet = pstmt.executeQuery();
 
-        while (resultSet.next()) {
-            String contractDescription = resultSet.getString(2);
-            boolean active = resultSet.getBoolean(3);
-            int idHotel = resultSet.getInt(4);
-            int idContract = resultSet.getInt(5);
+            while (resultSet.next()) {
+                String contractDescription = resultSet.getString(2);
+                boolean active = resultSet.getBoolean(3);
+                int idHotel = resultSet.getInt(4);
+                int idContract = resultSet.getInt(5);
 
-            ContractDto contract = contractService.getContractById(idContract);
+                HotelDto hotel = hotelService.getHotelById(idHotel);
+                ContractDto contract = contractService.getContractById(idContract);
 
-            String contractTitle = contract.getContractTitle();
-            LocalDate startDate = contract.getStartDate();
-            LocalDate endDate = contract.getEndDate();
-            LocalDate conciliationDate = contract.getConciliationDate();
-            int year = conciliationDate.getYear();
+                String contractTitle = contract.getContractTitle();
+                LocalDate startDate = contract.getStartDate();
+                LocalDate endDate = contract.getEndDate();
+                LocalDate conciliationDate = contract.getConciliationDate();
+                int year = conciliationDate.getYear();
 
-            hotelContract = new HotelContractDto(idHotelContract, contractTitle, startDate, endDate,
-                    conciliationDate, year, contractDescription, active, idHotel, idContract);
+                hotelContract = new HotelContractDto(idHotelContract, idContract, contractTitle, startDate, endDate,
+                        conciliationDate, contractDescription, hotel);
+            }
         }
 
         return hotelContract;
@@ -110,28 +116,30 @@ public class HotelContractServiceImpl implements IHotelContractService {
         ContractDto contract = contractService.getContractByTitle(contractTitle);
         int idContract = contract.getIdContract();
 
-        PreparedStatement pstmt = jdbcTemplate.getDataSource().getConnection().prepareStatement(
-                "SELECT * FROM hotel_contract WHERE id_contract = ?");
+        try (Connection connection = jdbcTemplate.getDataSource().getConnection()) {
+            PreparedStatement pstmt = connection.prepareStatement(
+                    "SELECT * FROM hotel_contract WHERE id_contract = ?");
 
-        pstmt.setInt(1, idContract);
+            pstmt.setInt(1, idContract);
 
-        ResultSet resultSet = pstmt.executeQuery();
+            ResultSet resultSet = pstmt.executeQuery();
 
-        while (resultSet.next()) {
-            int idHotelContract = resultSet.getInt(1);
-            String contractDescription = resultSet.getString(2);
-            boolean active = resultSet.getBoolean(3);
-            int idHotel = resultSet.getInt(4);
+            while (resultSet.next()) {
+                int idHotelContract = resultSet.getInt(1);
+                String contractDescription = resultSet.getString(2);
+                boolean active = resultSet.getBoolean(3);
+                int idHotel = resultSet.getInt(4);
 
-            LocalDate startDate = contract.getStartDate();
-            LocalDate endDate = contract.getEndDate();
-            LocalDate conciliationDate = contract.getConciliationDate();
-            int year = conciliationDate.getYear();
+                LocalDate startDate = contract.getStartDate();
+                LocalDate endDate = contract.getEndDate();
+                LocalDate conciliationDate = contract.getConciliationDate();
+                int year = conciliationDate.getYear();
 
-            HotelDto hotel = hotelService.getHotelById(idHotel);
+                HotelDto hotel = hotelService.getHotelById(idHotel);
 
-            hotelContract = new HotelContractDto(idHotelContract, contractTitle, startDate, endDate,
-                    conciliationDate, contractDescription, hotel, idContract);
+                hotelContract = new HotelContractDto(idHotelContract, idContract, contractTitle, startDate, endDate,
+                        conciliationDate, contractDescription, hotel);
+            }
         }
 
         return hotelContract;
@@ -144,38 +152,49 @@ public class HotelContractServiceImpl implements IHotelContractService {
 
         String function = "{call hotel_contract_insert(?,?,?,?)}";
 
-        CallableStatement statement = jdbcTemplate.getDataSource().getConnection().prepareCall(function);
-        statement.setString(2, hotelContract.getContractDescription());
-        statement.setBoolean(3, hotelContract.getActive());
-        statement.setInt(4, hotelContract.getHotel().getIdHotel());
-        statement.setInt(5, idContract);
-        statement.execute();
+        try (Connection connection = jdbcTemplate.getDataSource().getConnection()) {
+            CallableStatement statement = connection.prepareCall(function);
+            statement.setString(1, hotelContract.getContractDescription());
+            statement.setBoolean(2, hotelContract.getActive());
+            statement.setInt(3, hotelContract.getHotel().getIdHotel());
+            statement.setInt(4, idContract);
+            statement.execute();
+        }
 
     }
 
     @Override
     public void updateHotelContract(HotelContractDto hotelContract) throws SQLException {
+        hotelContract.setIdContract(getHotelContractById(hotelContract.getIdHotelContract()).getIdContract());
         contractService.updateContract(hotelContract);
 
         String function = "{call hotel_contract_update(?,?,?,?,?)}";
 
-        CallableStatement statement = jdbcTemplate.getDataSource().getConnection().prepareCall(function);
-        statement.setInt(2, hotelContract.getIdHotelContract());
-        statement.setString(3, hotelContract.getContractDescription());
-        statement.setBoolean(4, hotelContract.getActive());
-        statement.setInt(5, hotelContract.getHotel().getIdHotel());
-        statement.setInt(6, hotelContract.getIdContract());
-        statement.execute();
+        try (Connection connection = jdbcTemplate.getDataSource().getConnection()) {
+            CallableStatement statement = connection.prepareCall(function);
+            statement.setInt(1, hotelContract.getIdHotelContract());
+            statement.setString(2, hotelContract.getContractDescription());
+            statement.setBoolean(3, hotelContract.getActive());
+            statement.setInt(4, hotelContract.getHotel().getIdHotel());
+            statement.setInt(5, hotelContract.getIdContract());
+            statement.execute();
+        }
 
     }
 
     @Override
     public void deleteHotelContract(int idHotelContract) throws SQLException {
+        int idContract = getHotelContractById(idHotelContract).getIdContract();
+
         String function = "{call hotel_contract_delete(?)}";
 
-        CallableStatement statement = jdbcTemplate.getDataSource().getConnection().prepareCall(function);
-        statement.setInt(1, idHotelContract);
-        statement.execute();
+        try (Connection connection = jdbcTemplate.getDataSource().getConnection()) {
+            CallableStatement statement = connection.prepareCall(function);
+            statement.setInt(1, idHotelContract);
+            statement.execute();
+        }
+
+        contractService.deleteContract(idContract);
 
     }
 

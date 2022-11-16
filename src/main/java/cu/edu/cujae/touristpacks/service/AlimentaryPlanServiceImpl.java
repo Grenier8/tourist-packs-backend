@@ -28,22 +28,22 @@ public class AlimentaryPlanServiceImpl implements IAlimentaryPlanService {
 
         String function = "{?= call select_all_alimentary_plan()}";
 
-        Connection connection = jdbcTemplate.getDataSource().getConnection();
-        connection.setAutoCommit(false);
-        CallableStatement statement = connection.prepareCall(function);
-        statement.registerOutParameter(1, Types.OTHER);
-        statement.execute();
+        try (Connection connection = jdbcTemplate.getDataSource().getConnection()) {
+            connection.setAutoCommit(false);
+            CallableStatement statement = connection.prepareCall(function);
+            statement.registerOutParameter(1, Types.OTHER);
+            statement.execute();
 
-        ResultSet resultSet = (ResultSet) statement.getObject(1);
+            ResultSet resultSet = (ResultSet) statement.getObject(1);
 
-        while (resultSet.next()) {
-            int idPlan = resultSet.getInt(1);
-            String planName = resultSet.getString(2);
+            while (resultSet.next()) {
+                int idPlan = resultSet.getInt(1);
+                String planName = resultSet.getString(2);
 
-            AlimentaryPlanDto dto = new AlimentaryPlanDto(idPlan, planName);
-            list.add(dto);
+                AlimentaryPlanDto dto = new AlimentaryPlanDto(idPlan, planName);
+                list.add(dto);
+            }
         }
-
         return list;
     }
 
@@ -51,39 +51,42 @@ public class AlimentaryPlanServiceImpl implements IAlimentaryPlanService {
     public AlimentaryPlanDto getAlimentaryPlanById(int idAlimentaryPlan) throws SQLException {
         AlimentaryPlanDto alimentaryPlan = null;
 
-        PreparedStatement pstmt = jdbcTemplate.getDataSource().getConnection().prepareStatement(
-                "SELECT * FROM alimentary_plan where id_plan = ?");
+        try (Connection connection = jdbcTemplate.getDataSource().getConnection()) {
+            PreparedStatement pstmt = connection.prepareStatement(
+                    "SELECT * FROM alimentary_plan where id_plan = ?");
 
-        pstmt.setInt(1, idAlimentaryPlan);
+            pstmt.setInt(1, idAlimentaryPlan);
 
-        ResultSet resultSet = pstmt.executeQuery();
+            ResultSet resultSet = pstmt.executeQuery();
 
-        while (resultSet.next()) {
-            String alimentaryPlanName = resultSet.getString(2);
+            while (resultSet.next()) {
+                String alimentaryPlanName = resultSet.getString(2);
 
-            alimentaryPlan = new AlimentaryPlanDto(idAlimentaryPlan, alimentaryPlanName);
+                alimentaryPlan = new AlimentaryPlanDto(idAlimentaryPlan, alimentaryPlanName);
+            }
         }
-
         return alimentaryPlan;
+
     }
 
     @Override
     public AlimentaryPlanDto getAlimentaryPlanByName(String alimentaryPlanName) throws SQLException {
         AlimentaryPlanDto alimentaryPlan = null;
 
-        PreparedStatement pstmt = jdbcTemplate.getDataSource().getConnection().prepareStatement(
-                "SELECT * FROM alimentary_plan where plan_name = ?");
+        try (Connection connection = jdbcTemplate.getDataSource().getConnection()) {
+            PreparedStatement pstmt = connection.prepareStatement(
+                    "SELECT * FROM alimentary_plan where plan_name = ?");
 
-        pstmt.setString(1, alimentaryPlanName);
+            pstmt.setString(1, alimentaryPlanName);
 
-        ResultSet resultSet = pstmt.executeQuery();
+            ResultSet resultSet = pstmt.executeQuery();
 
-        while (resultSet.next()) {
-            int idAlimentaryPlan = resultSet.getInt(2);
+            while (resultSet.next()) {
+                int idAlimentaryPlan = resultSet.getInt(2);
 
-            alimentaryPlan = new AlimentaryPlanDto(idAlimentaryPlan, alimentaryPlanName);
+                alimentaryPlan = new AlimentaryPlanDto(idAlimentaryPlan, alimentaryPlanName);
+            }
         }
-
         return alimentaryPlan;
     }
 
@@ -91,28 +94,34 @@ public class AlimentaryPlanServiceImpl implements IAlimentaryPlanService {
     public void createAlimentaryPlan(AlimentaryPlanDto alimentaryPlan) throws SQLException {
         String function = "{call alimentary_plan_insert(?)}";
 
-        CallableStatement statement = jdbcTemplate.getDataSource().getConnection().prepareCall(function);
-        statement.setString(1, alimentaryPlan.getAlimentaryPlanName());
-        statement.execute();
+        try (Connection connection = jdbcTemplate.getDataSource().getConnection()) {
+            CallableStatement statement = connection.prepareCall(function);
+            statement.setString(1, alimentaryPlan.getAlimentaryPlanName());
+            statement.execute();
+        }
     }
 
     @Override
     public void updateAlimentaryPlan(AlimentaryPlanDto alimentaryPlan) throws SQLException {
         String function = "{call alimentary_plan_update(?,?)}";
 
-        CallableStatement statement = jdbcTemplate.getDataSource().getConnection().prepareCall(function);
-        statement.setInt(1, alimentaryPlan.getIdAlimentaryPlan());
-        statement.setString(2, alimentaryPlan.getAlimentaryPlanName());
-        statement.execute();
+        try (Connection connection = jdbcTemplate.getDataSource().getConnection()) {
+            CallableStatement statement = connection.prepareCall(function);
+            statement.setInt(1, alimentaryPlan.getIdAlimentaryPlan());
+            statement.setString(2, alimentaryPlan.getAlimentaryPlanName());
+            statement.execute();
+        }
     }
 
     @Override
     public void deleteAlimentaryPlan(int idAlimentaryPlan) throws SQLException {
         String function = "{call alimentary_plan_delete(?)}";
 
-        CallableStatement statement = jdbcTemplate.getDataSource().getConnection().prepareCall(function);
-        statement.setInt(1, idAlimentaryPlan);
-        statement.execute();
+        try (Connection connection = jdbcTemplate.getDataSource().getConnection()) {
+            CallableStatement statement = connection.prepareCall(function);
+            statement.setInt(1, idAlimentaryPlan);
+            statement.execute();
+        }
     }
 
 }

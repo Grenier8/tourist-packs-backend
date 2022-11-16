@@ -30,25 +30,25 @@ public class SeasonServiceImpl implements ISeasonService {
 
         String function = "{?= call select_all_season()}";
 
-        Connection connection = jdbcTemplate.getDataSource().getConnection();
-        connection.setAutoCommit(false);
-        CallableStatement statement = connection.prepareCall(function);
-        statement.registerOutParameter(1, Types.OTHER);
-        statement.execute();
+        try (Connection connection = jdbcTemplate.getDataSource().getConnection()) {
+            connection.setAutoCommit(false);
+            CallableStatement statement = connection.prepareCall(function);
+            statement.registerOutParameter(1, Types.OTHER);
+            statement.execute();
 
-        ResultSet resultSet = (ResultSet) statement.getObject(1);
+            ResultSet resultSet = (ResultSet) statement.getObject(1);
 
-        while (resultSet.next()) {
-            int idSeason = resultSet.getInt(1);
-            String seasonName = resultSet.getString(2);
-            LocalDate startSeason = resultSet.getDate(3).toLocalDate();
-            LocalDate endSeason = resultSet.getDate(4).toLocalDate();
-            String seasonDescription = resultSet.getString(5);
+            while (resultSet.next()) {
+                int idSeason = resultSet.getInt(1);
+                String seasonName = resultSet.getString(2);
+                LocalDate startSeason = resultSet.getDate(3).toLocalDate();
+                LocalDate endSeason = resultSet.getDate(4).toLocalDate();
+                String seasonDescription = resultSet.getString(5);
 
-            SeasonDto dto = new SeasonDto(idSeason, seasonName, startSeason, endSeason, seasonDescription);
-            list.add(dto);
+                SeasonDto dto = new SeasonDto(idSeason, seasonName, startSeason, endSeason, seasonDescription);
+                list.add(dto);
+            }
         }
-
         return list;
     }
 
@@ -56,22 +56,23 @@ public class SeasonServiceImpl implements ISeasonService {
     public SeasonDto getSeasonById(int idSeason) throws SQLException {
         SeasonDto season = null;
 
-        PreparedStatement pstmt = jdbcTemplate.getDataSource().getConnection().prepareStatement(
-                "SELECT * FROM season where id_season = ?");
+        try (Connection connection = jdbcTemplate.getDataSource().getConnection()) {
+            PreparedStatement pstmt = connection.prepareStatement(
+                    "SELECT * FROM season where id_season = ?");
 
-        pstmt.setInt(1, idSeason);
+            pstmt.setInt(1, idSeason);
 
-        ResultSet resultSet = pstmt.executeQuery();
+            ResultSet resultSet = pstmt.executeQuery();
 
-        while (resultSet.next()) {
-            String seasonName = resultSet.getString(2);
-            LocalDate startSeason = resultSet.getDate(3).toLocalDate();
-            LocalDate endSeason = resultSet.getDate(4).toLocalDate();
-            String seasonDescription = resultSet.getString(5);
+            while (resultSet.next()) {
+                String seasonName = resultSet.getString(2);
+                LocalDate startSeason = resultSet.getDate(3).toLocalDate();
+                LocalDate endSeason = resultSet.getDate(4).toLocalDate();
+                String seasonDescription = resultSet.getString(5);
 
-            season = new SeasonDto(idSeason, seasonName, startSeason, endSeason, seasonDescription);
+                season = new SeasonDto(idSeason, seasonName, startSeason, endSeason, seasonDescription);
+            }
         }
-
         return season;
     }
 
@@ -79,22 +80,23 @@ public class SeasonServiceImpl implements ISeasonService {
     public SeasonDto getSeasonByName(String seasonName) throws SQLException {
         SeasonDto season = null;
 
-        PreparedStatement pstmt = jdbcTemplate.getDataSource().getConnection().prepareStatement(
-                "SELECT * FROM season where season_name = ?");
+        try (Connection connection = jdbcTemplate.getDataSource().getConnection()) {
+            PreparedStatement pstmt = connection.prepareStatement(
+                    "SELECT * FROM season where season_name = ?");
 
-        pstmt.setString(1, seasonName);
+            pstmt.setString(1, seasonName);
 
-        ResultSet resultSet = pstmt.executeQuery();
+            ResultSet resultSet = pstmt.executeQuery();
 
-        while (resultSet.next()) {
-            int idSeason = resultSet.getInt(1);
-            LocalDate startSeason = resultSet.getDate(3).toLocalDate();
-            LocalDate endSeason = resultSet.getDate(4).toLocalDate();
-            String seasonDescription = resultSet.getString(5);
+            while (resultSet.next()) {
+                int idSeason = resultSet.getInt(1);
+                LocalDate startSeason = resultSet.getDate(3).toLocalDate();
+                LocalDate endSeason = resultSet.getDate(4).toLocalDate();
+                String seasonDescription = resultSet.getString(5);
 
-            season = new SeasonDto(idSeason, seasonName, startSeason, endSeason, seasonDescription);
+                season = new SeasonDto(idSeason, seasonName, startSeason, endSeason, seasonDescription);
+            }
         }
-
         return season;
     }
 
@@ -102,35 +104,41 @@ public class SeasonServiceImpl implements ISeasonService {
     public void createSeason(SeasonDto season) throws SQLException {
         String function = "{call season_insert(?,?,?,?)}";
 
-        CallableStatement statement = jdbcTemplate.getDataSource().getConnection().prepareCall(function);
-        statement.setString(1, season.getSeasonName());
-        statement.setDate(2, Date.valueOf(season.getStartSeason()));
-        statement.setDate(3, Date.valueOf(season.getEndSeason()));
-        statement.setString(4, season.getSeasonDescription());
+        try (Connection connection = jdbcTemplate.getDataSource().getConnection()) {
+            CallableStatement statement = connection.prepareCall(function);
+            statement.setString(1, season.getSeasonName());
+            statement.setDate(2, Date.valueOf(season.getStartSeason()));
+            statement.setDate(3, Date.valueOf(season.getEndSeason()));
+            statement.setString(4, season.getSeasonDescription());
 
-        statement.execute();
+            statement.execute();
+        }
     }
 
     @Override
     public void updateSeason(SeasonDto season) throws SQLException {
         String function = "{call season_update(?,?,?,?,?)}";
 
-        CallableStatement statement = jdbcTemplate.getDataSource().getConnection().prepareCall(function);
-        statement.setInt(1, season.getIdSeason());
-        statement.setString(2, season.getSeasonName());
-        statement.setDate(3, Date.valueOf(season.getStartSeason()));
-        statement.setDate(4, Date.valueOf(season.getEndSeason()));
-        statement.setString(5, season.getSeasonDescription());
-        statement.execute();
+        try (Connection connection = jdbcTemplate.getDataSource().getConnection()) {
+            CallableStatement statement = connection.prepareCall(function);
+            statement.setInt(1, season.getIdSeason());
+            statement.setString(2, season.getSeasonName());
+            statement.setDate(3, Date.valueOf(season.getStartSeason()));
+            statement.setDate(4, Date.valueOf(season.getEndSeason()));
+            statement.setString(5, season.getSeasonDescription());
+            statement.execute();
+        }
     }
 
     @Override
     public void deleteSeason(int idSeason) throws SQLException {
         String function = "{call season_delete(?)}";
 
-        CallableStatement statement = jdbcTemplate.getDataSource().getConnection().prepareCall(function);
-        statement.setInt(1, idSeason);
-        statement.execute();
+        try (Connection connection = jdbcTemplate.getDataSource().getConnection()) {
+            CallableStatement statement = connection.prepareCall(function);
+            statement.setInt(1, idSeason);
+            statement.execute();
+        }
     }
 
 }

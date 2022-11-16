@@ -44,39 +44,40 @@ public class OtherServiceContractServiceImpl implements IOtherServiceContractSer
 
         String function = "{?= call select_all_other_service_contract()}";
 
-        Connection connection = jdbcTemplate.getDataSource().getConnection();
-        connection.setAutoCommit(false);
-        CallableStatement statement = connection.prepareCall(function);
-        statement.registerOutParameter(1, Types.OTHER);
-        statement.execute();
+        try (Connection connection = jdbcTemplate.getDataSource().getConnection()) {
+            connection.setAutoCommit(false);
+            CallableStatement statement = connection.prepareCall(function);
+            statement.registerOutParameter(1, Types.OTHER);
+            statement.execute();
 
-        ResultSet resultSet = (ResultSet) statement.getObject(1);
+            ResultSet resultSet = (ResultSet) statement.getObject(1);
 
-        while (resultSet.next()) {
-            int idOtherServiceContract = resultSet.getInt(1);
-            String contractDescription = resultSet.getString(2);
-            double costPerPax = resultSet.getDouble(3);
-            int idServiceType = resultSet.getInt(4);
-            int idProvince = resultSet.getInt(5);
-            int idContract = resultSet.getInt(6);
+            while (resultSet.next()) {
+                int idOtherServiceContract = resultSet.getInt(1);
+                String contractDescription = resultSet.getString(2);
+                double costPerPax = resultSet.getDouble(3);
+                int idServiceType = resultSet.getInt(4);
+                int idProvince = resultSet.getInt(5);
+                int idContract = resultSet.getInt(6);
 
-            ContractDto contract = contractService.getContractById(idContract);
+                ContractDto contract = contractService.getContractById(idContract);
 
-            String contractTitle = contract.getContractTitle();
-            LocalDate startDate = contract.getStartDate();
-            LocalDate endDate = contract.getEndDate();
-            LocalDate conciliationDate = contract.getConciliationDate();
-            int year = conciliationDate.getYear();
+                String contractTitle = contract.getContractTitle();
+                LocalDate startDate = contract.getStartDate();
+                LocalDate endDate = contract.getEndDate();
+                LocalDate conciliationDate = contract.getConciliationDate();
+                int year = conciliationDate.getYear();
 
-            ServiceTypeDto serviceType = serviceTypeService.getServiceTypeById(idServiceType);
-            ProvinceDto province = provinceService.getProvinceById(idProvince);
+                ServiceTypeDto serviceType = serviceTypeService.getServiceTypeById(idServiceType);
+                ProvinceDto province = provinceService.getProvinceById(idProvince);
 
-            OtherServiceContractDto otherServiceContract = new OtherServiceContractDto(idOtherServiceContract,
-                    contractTitle,
-                    startDate, endDate, conciliationDate, contractDescription, costPerPax, serviceType, province,
-                    idContract);
+                OtherServiceContractDto otherServiceContract = new OtherServiceContractDto(idOtherServiceContract,
+                        contractTitle,
+                        startDate, endDate, conciliationDate, contractDescription, costPerPax, serviceType, province,
+                        idContract);
 
-            list.add(otherServiceContract);
+                list.add(otherServiceContract);
+            }
         }
 
         return list;
@@ -86,35 +87,37 @@ public class OtherServiceContractServiceImpl implements IOtherServiceContractSer
     public OtherServiceContractDto getOtherServiceContractById(int idOtherServiceContract) throws SQLException {
         OtherServiceContractDto otherServiceContract = null;
 
-        PreparedStatement pstmt = jdbcTemplate.getDataSource().getConnection().prepareStatement(
-                "SELECT * FROM other_service_contract where id_other_service_contract = ?");
+        try (Connection connection = jdbcTemplate.getDataSource().getConnection()) {
+            PreparedStatement pstmt = connection.prepareStatement(
+                    "SELECT * FROM other_service_contract where id_other_service_contract = ?");
 
-        pstmt.setInt(1, idOtherServiceContract);
+            pstmt.setInt(1, idOtherServiceContract);
 
-        ResultSet resultSet = pstmt.executeQuery();
+            ResultSet resultSet = pstmt.executeQuery();
 
-        while (resultSet.next()) {
-            String contractDescription = resultSet.getString(2);
-            double costPerPax = resultSet.getDouble(3);
-            int idServiceType = resultSet.getInt(4);
-            int idProvince = resultSet.getInt(5);
-            int idContract = resultSet.getInt(6);
+            while (resultSet.next()) {
+                String contractDescription = resultSet.getString(2);
+                double costPerPax = resultSet.getDouble(3);
+                int idServiceType = resultSet.getInt(4);
+                int idProvince = resultSet.getInt(5);
+                int idContract = resultSet.getInt(6);
 
-            ContractDto contract = contractService.getContractById(idContract);
+                ContractDto contract = contractService.getContractById(idContract);
 
-            String contractTitle = contract.getContractTitle();
-            LocalDate startDate = contract.getStartDate();
-            LocalDate endDate = contract.getEndDate();
-            LocalDate conciliationDate = contract.getConciliationDate();
-            int year = conciliationDate.getYear();
+                String contractTitle = contract.getContractTitle();
+                LocalDate startDate = contract.getStartDate();
+                LocalDate endDate = contract.getEndDate();
+                LocalDate conciliationDate = contract.getConciliationDate();
+                int year = conciliationDate.getYear();
 
-            ServiceTypeDto serviceType = serviceTypeService.getServiceTypeById(idServiceType);
-            ProvinceDto province = provinceService.getProvinceById(idProvince);
+                ServiceTypeDto serviceType = serviceTypeService.getServiceTypeById(idServiceType);
+                ProvinceDto province = provinceService.getProvinceById(idProvince);
 
-            otherServiceContract = new OtherServiceContractDto(idOtherServiceContract,
-                    contractTitle,
-                    startDate, endDate, conciliationDate, contractDescription, costPerPax, serviceType, province,
-                    idContract);
+                otherServiceContract = new OtherServiceContractDto(idOtherServiceContract,
+                        contractTitle,
+                        startDate, endDate, conciliationDate, contractDescription, costPerPax, serviceType, province,
+                        idContract);
+            }
         }
 
         return otherServiceContract;
@@ -128,32 +131,34 @@ public class OtherServiceContractServiceImpl implements IOtherServiceContractSer
         ContractDto contract = contractService.getContractByTitle(contractTitle);
         int idContract = contract.getIdContract();
 
-        PreparedStatement pstmt = jdbcTemplate.getDataSource().getConnection().prepareStatement(
-                "SELECT * FROM other_service_contract WHERE id_contract = ?");
+        try (Connection connection = jdbcTemplate.getDataSource().getConnection()) {
+            PreparedStatement pstmt = connection.prepareStatement(
+                    "SELECT * FROM other_service_contract WHERE id_contract = ?");
 
-        pstmt.setInt(1, idContract);
+            pstmt.setInt(1, idContract);
 
-        ResultSet resultSet = pstmt.executeQuery();
+            ResultSet resultSet = pstmt.executeQuery();
 
-        while (resultSet.next()) {
-            int idOtherServiceContract = resultSet.getInt(1);
-            String contractDescription = resultSet.getString(2);
-            double costPerPax = resultSet.getDouble(3);
-            int idServiceType = resultSet.getInt(4);
-            int idProvince = resultSet.getInt(5);
+            while (resultSet.next()) {
+                int idOtherServiceContract = resultSet.getInt(1);
+                String contractDescription = resultSet.getString(2);
+                double costPerPax = resultSet.getDouble(3);
+                int idServiceType = resultSet.getInt(4);
+                int idProvince = resultSet.getInt(5);
 
-            LocalDate startDate = contract.getStartDate();
-            LocalDate endDate = contract.getEndDate();
-            LocalDate conciliationDate = contract.getConciliationDate();
-            int year = conciliationDate.getYear();
+                LocalDate startDate = contract.getStartDate();
+                LocalDate endDate = contract.getEndDate();
+                LocalDate conciliationDate = contract.getConciliationDate();
+                int year = conciliationDate.getYear();
 
-            ServiceTypeDto serviceType = serviceTypeService.getServiceTypeById(idServiceType);
-            ProvinceDto province = provinceService.getProvinceById(idProvince);
+                ServiceTypeDto serviceType = serviceTypeService.getServiceTypeById(idServiceType);
+                ProvinceDto province = provinceService.getProvinceById(idProvince);
 
-            otherServiceContract = new OtherServiceContractDto(idOtherServiceContract,
-                    contractTitle,
-                    startDate, endDate, conciliationDate, contractDescription, costPerPax, serviceType, province,
-                    idContract);
+                otherServiceContract = new OtherServiceContractDto(idOtherServiceContract,
+                        contractTitle,
+                        startDate, endDate, conciliationDate, contractDescription, costPerPax, serviceType, province,
+                        idContract);
+            }
         }
 
         return otherServiceContract;
@@ -166,41 +171,52 @@ public class OtherServiceContractServiceImpl implements IOtherServiceContractSer
 
         String function = "{call other_service_contract_insert(?,?,?,?,?)}";
 
-        CallableStatement statement = jdbcTemplate.getDataSource().getConnection().prepareCall(function);
-        statement.setString(1, otherServiceContract.getContractDescription());
-        statement.setDouble(2, otherServiceContract.getCostPerPax());
-        statement.setInt(3, otherServiceContract.getServiceType().getIdServiceType());
-        statement.setInt(4, otherServiceContract.getProvince().getIdProvince());
-        statement.setInt(5, idContract);
-        statement.execute();
+        try (Connection connection = jdbcTemplate.getDataSource().getConnection()) {
+            CallableStatement statement = connection.prepareCall(function);
+            statement.setString(1, otherServiceContract.getContractDescription());
+            statement.setDouble(2, otherServiceContract.getCostPerPax());
+            statement.setInt(3, otherServiceContract.getServiceType().getIdServiceType());
+            statement.setInt(4, otherServiceContract.getProvince().getIdProvince());
+            statement.setInt(5, idContract);
+            statement.execute();
+        }
 
     }
 
     @Override
     public void updateOtherServiceContract(OtherServiceContractDto otherServiceContract) throws SQLException {
+        otherServiceContract.setIdContract(
+                getOtherServiceContractById(otherServiceContract.getIdOtherServiceContract()).getIdContract());
         contractService.updateContract(otherServiceContract);
         int idContract = contractService.getContractByTitle(otherServiceContract.getContractTitle()).getIdContract();
 
         String function = "{call other_service_contract_update(?,?,?,?,?,?)}";
 
-        CallableStatement statement = jdbcTemplate.getDataSource().getConnection().prepareCall(function);
-        statement.setInt(1, otherServiceContract.getIdOtherServiceContract());
-        statement.setString(2, otherServiceContract.getContractDescription());
-        statement.setDouble(3, otherServiceContract.getCostPerPax());
-        statement.setInt(4, otherServiceContract.getServiceType().getIdServiceType());
-        statement.setInt(5, otherServiceContract.getProvince().getIdProvince());
-        statement.setInt(6, idContract);
-        statement.execute();
+        try (Connection connection = jdbcTemplate.getDataSource().getConnection()) {
+            CallableStatement statement = connection.prepareCall(function);
+            statement.setInt(1, otherServiceContract.getIdOtherServiceContract());
+            statement.setString(2, otherServiceContract.getContractDescription());
+            statement.setDouble(3, otherServiceContract.getCostPerPax());
+            statement.setInt(4, otherServiceContract.getServiceType().getIdServiceType());
+            statement.setInt(5, otherServiceContract.getProvince().getIdProvince());
+            statement.setInt(6, idContract);
+            statement.execute();
+        }
     }
 
     @Override
     public void deleteOtherServiceContract(int idOtherServiceContract) throws SQLException {
+        int idContract = getOtherServiceContractById(idOtherServiceContract).getIdContract();
+
         String function = "{call other_service_contract_delete(?)}";
 
-        CallableStatement statement = jdbcTemplate.getDataSource().getConnection().prepareCall(function);
-        statement.setInt(1, idOtherServiceContract);
-        statement.execute();
+        try (Connection connection = jdbcTemplate.getDataSource().getConnection()) {
+            CallableStatement statement = connection.prepareCall(function);
+            statement.setInt(1, idOtherServiceContract);
+            statement.execute();
+        }
 
+        contractService.deleteContract(idContract);
     }
 
 }

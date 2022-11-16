@@ -28,20 +28,21 @@ public class HotelChainServiceImpl implements IHotelChainService {
 
         String function = "{?= call select_all_hotel_chain()}";
 
-        Connection connection = jdbcTemplate.getDataSource().getConnection();
-        connection.setAutoCommit(false);
-        CallableStatement statement = connection.prepareCall(function);
-        statement.registerOutParameter(1, Types.OTHER);
-        statement.execute();
+        try (Connection connection = jdbcTemplate.getDataSource().getConnection()) {
+            connection.setAutoCommit(false);
+            CallableStatement statement = connection.prepareCall(function);
+            statement.registerOutParameter(1, Types.OTHER);
+            statement.execute();
 
-        ResultSet resultSet = (ResultSet) statement.getObject(1);
+            ResultSet resultSet = (ResultSet) statement.getObject(1);
 
-        while (resultSet.next()) {
-            int idHotelChain = resultSet.getInt(1);
-            String hotelChainName = resultSet.getString(2);
+            while (resultSet.next()) {
+                int idHotelChain = resultSet.getInt(1);
+                String hotelChainName = resultSet.getString(2);
 
-            HotelChainDto dto = new HotelChainDto(idHotelChain, hotelChainName);
-            list.add(dto);
+                HotelChainDto dto = new HotelChainDto(idHotelChain, hotelChainName);
+                list.add(dto);
+            }
         }
 
         return list;
@@ -73,9 +74,11 @@ public class HotelChainServiceImpl implements IHotelChainService {
     public void createHotelChain(HotelChainDto hotelChain) throws SQLException {
         String function = "{call hotel_chain_insert(?)}";
 
-        CallableStatement statement = jdbcTemplate.getDataSource().getConnection().prepareCall(function);
-        statement.setString(1, hotelChain.getHotelChainName());
-        statement.execute();
+        try (Connection connection = jdbcTemplate.getDataSource().getConnection()) {
+            CallableStatement statement = connection.prepareCall(function);
+            statement.setString(1, hotelChain.getHotelChainName());
+            statement.execute();
+        }
 
     }
 
@@ -83,10 +86,12 @@ public class HotelChainServiceImpl implements IHotelChainService {
     public void updateHotelChain(HotelChainDto hotelChain) throws SQLException {
         String function = "{call hotel_chain_update(?,?)}";
 
-        CallableStatement statement = jdbcTemplate.getDataSource().getConnection().prepareCall(function);
-        statement.setInt(1, hotelChain.getIdHotelChain());
-        statement.setString(2, hotelChain.getHotelChainName());
-        statement.execute();
+        try (Connection connection = jdbcTemplate.getDataSource().getConnection()) {
+            CallableStatement statement = connection.prepareCall(function);
+            statement.setInt(1, hotelChain.getIdHotelChain());
+            statement.setString(2, hotelChain.getHotelChainName());
+            statement.execute();
+        }
 
     }
 
@@ -94,9 +99,11 @@ public class HotelChainServiceImpl implements IHotelChainService {
     public void deleteHotelChain(int hotelChainId) throws SQLException {
         String function = "{call hotel_chain_delete(?)}";
 
-        CallableStatement statement = jdbcTemplate.getDataSource().getConnection().prepareCall(function);
-        statement.setInt(1, hotelChainId);
-        statement.execute();
+        try (Connection connection = jdbcTemplate.getDataSource().getConnection()) {
+            CallableStatement statement = connection.prepareCall(function);
+            statement.setInt(1, hotelChainId);
+            statement.execute();
+        }
 
     }
 
@@ -104,17 +111,19 @@ public class HotelChainServiceImpl implements IHotelChainService {
     public HotelChainDto getHotelChainByName(String hotelChainName) throws SQLException {
         HotelChainDto hotelChain = null;
 
-        PreparedStatement pstmt = jdbcTemplate.getDataSource().getConnection().prepareStatement(
-                "SELECT * FROM hotel_chain where chain_name = ?");
+        try (Connection connection = jdbcTemplate.getDataSource().getConnection()) {
+            PreparedStatement pstmt = connection.prepareStatement(
+                    "SELECT * FROM hotel_chain where chain_name = ?");
 
-        pstmt.setString(1, hotelChainName);
+            pstmt.setString(1, hotelChainName);
 
-        ResultSet resultSet = pstmt.executeQuery();
+            ResultSet resultSet = pstmt.executeQuery();
 
-        while (resultSet.next()) {
-            int hotelChainId = resultSet.getInt(2);
+            while (resultSet.next()) {
+                int hotelChainId = resultSet.getInt(2);
 
-            hotelChain = new HotelChainDto(hotelChainId, hotelChainName);
+                hotelChain = new HotelChainDto(hotelChainId, hotelChainName);
+            }
         }
 
         return hotelChain;

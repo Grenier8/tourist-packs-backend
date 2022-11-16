@@ -23,11 +23,8 @@ public class ContractDto {
 
 	public ContractDto(int idContract, String contractTitle, LocalDate startDate, LocalDate endDate,
 			LocalDate conciliationDate) {
+		this(contractTitle, startDate, endDate, conciliationDate);
 		this.idContract = idContract;
-		this.contractTitle = contractTitle;
-		this.startDate = startDate;
-		this.endDate = endDate;
-		this.conciliationDate = conciliationDate;
 	}
 
 	public int getIdContract() {

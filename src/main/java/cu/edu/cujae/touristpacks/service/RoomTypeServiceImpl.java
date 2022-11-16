@@ -28,20 +28,21 @@ public class RoomTypeServiceImpl implements IRoomTypeService {
 
         String function = "{?= call select_all_room_type()}";
 
-        Connection connection = jdbcTemplate.getDataSource().getConnection();
-        connection.setAutoCommit(false);
-        CallableStatement statement = connection.prepareCall(function);
-        statement.registerOutParameter(1, Types.OTHER);
-        statement.execute();
+        try (Connection connection = jdbcTemplate.getDataSource().getConnection()) {
+            connection.setAutoCommit(false);
+            CallableStatement statement = connection.prepareCall(function);
+            statement.registerOutParameter(1, Types.OTHER);
+            statement.execute();
 
-        ResultSet resultSet = (ResultSet) statement.getObject(1);
+            ResultSet resultSet = (ResultSet) statement.getObject(1);
 
-        while (resultSet.next()) {
-            int idRoomType = resultSet.getInt(1);
-            String roomTypeName = resultSet.getString(2);
+            while (resultSet.next()) {
+                int idRoomType = resultSet.getInt(1);
+                String roomTypeName = resultSet.getString(2);
 
-            RoomTypeDto dto = new RoomTypeDto(idRoomType, roomTypeName);
-            list.add(dto);
+                RoomTypeDto dto = new RoomTypeDto(idRoomType, roomTypeName);
+                list.add(dto);
+            }
         }
         return list;
     }
@@ -50,17 +51,19 @@ public class RoomTypeServiceImpl implements IRoomTypeService {
     public RoomTypeDto getRoomTypeById(int idRoomType) throws SQLException {
         RoomTypeDto roomType = null;
 
-        PreparedStatement pstmt = jdbcTemplate.getDataSource().getConnection().prepareStatement(
-                "SELECT * FROM room_type where id_room_type = ?");
+        try (Connection connection = jdbcTemplate.getDataSource().getConnection()) {
+            PreparedStatement pstmt = connection.prepareStatement(
+                    "SELECT * FROM room_type where id_room_type = ?");
 
-        pstmt.setInt(1, idRoomType);
+            pstmt.setInt(1, idRoomType);
 
-        ResultSet resultSet = pstmt.executeQuery();
+            ResultSet resultSet = pstmt.executeQuery();
 
-        while (resultSet.next()) {
-            String roomTypeName = resultSet.getString(2);
+            while (resultSet.next()) {
+                String roomTypeName = resultSet.getString(2);
 
-            roomType = new RoomTypeDto(idRoomType, roomTypeName);
+                roomType = new RoomTypeDto(idRoomType, roomTypeName);
+            }
         }
 
         return roomType;
@@ -70,19 +73,20 @@ public class RoomTypeServiceImpl implements IRoomTypeService {
     public RoomTypeDto getRoomTypeByName(String roomTypeName) throws SQLException {
         RoomTypeDto roomType = null;
 
-        PreparedStatement pstmt = jdbcTemplate.getDataSource().getConnection().prepareStatement(
-                "SELECT * FROM room_type where room_type_name = ?");
+        try (Connection connection = jdbcTemplate.getDataSource().getConnection()) {
+            PreparedStatement pstmt = connection.prepareStatement(
+                    "SELECT * FROM room_type where room_type_name = ?");
 
-        pstmt.setString(1, roomTypeName);
+            pstmt.setString(1, roomTypeName);
 
-        ResultSet resultSet = pstmt.executeQuery();
+            ResultSet resultSet = pstmt.executeQuery();
 
-        while (resultSet.next()) {
-            int idRoomType = resultSet.getInt(2);
+            while (resultSet.next()) {
+                int idRoomType = resultSet.getInt(2);
 
-            roomType = new RoomTypeDto(idRoomType, roomTypeName);
+                roomType = new RoomTypeDto(idRoomType, roomTypeName);
+            }
         }
-
         return roomType;
     }
 
@@ -90,9 +94,11 @@ public class RoomTypeServiceImpl implements IRoomTypeService {
     public void createRoomType(RoomTypeDto roomType) throws SQLException {
         String function = "{call room_type_insert(?)}";
 
-        CallableStatement statement = jdbcTemplate.getDataSource().getConnection().prepareCall(function);
-        statement.setString(1, roomType.getRoomTypeName());
-        statement.execute();
+        try (Connection connection = jdbcTemplate.getDataSource().getConnection()) {
+            CallableStatement statement = connection.prepareCall(function);
+            statement.setString(1, roomType.getRoomTypeName());
+            statement.execute();
+        }
 
     }
 
@@ -100,10 +106,12 @@ public class RoomTypeServiceImpl implements IRoomTypeService {
     public void updateRoomType(RoomTypeDto roomType) throws SQLException {
         String function = "{call room_type_update(?,?)}";
 
-        CallableStatement statement = jdbcTemplate.getDataSource().getConnection().prepareCall(function);
-        statement.setInt(1, roomType.getIdRoomType());
-        statement.setString(2, roomType.getRoomTypeName());
-        statement.execute();
+        try (Connection connection = jdbcTemplate.getDataSource().getConnection()) {
+            CallableStatement statement = connection.prepareCall(function);
+            statement.setInt(1, roomType.getIdRoomType());
+            statement.setString(2, roomType.getRoomTypeName());
+            statement.execute();
+        }
 
     }
 
@@ -111,9 +119,11 @@ public class RoomTypeServiceImpl implements IRoomTypeService {
     public void deleteRoomType(int idRoomType) throws SQLException {
         String function = "{call room_type_delete(?)}";
 
-        CallableStatement statement = jdbcTemplate.getDataSource().getConnection().prepareCall(function);
-        statement.setInt(1, idRoomType);
-        statement.execute();
+        try (Connection connection = jdbcTemplate.getDataSource().getConnection()) {
+            CallableStatement statement = connection.prepareCall(function);
+            statement.setInt(1, idRoomType);
+            statement.execute();
+        }
 
     }
 

@@ -38,24 +38,27 @@ public class TransportServiceTouristPackServiceImpl implements ITransportService
 
         String function = "{?= call select_all_transport_service_turist_pack()}";
 
-        Connection connection = jdbcTemplate.getDataSource().getConnection();
-        connection.setAutoCommit(false);
-        CallableStatement statement = connection.prepareCall(function);
-        statement.registerOutParameter(1, Types.OTHER);
-        statement.execute();
+        try (Connection connection = jdbcTemplate.getDataSource().getConnection()) {
+            connection.setAutoCommit(false);
+            CallableStatement statement = connection.prepareCall(function);
+            statement.registerOutParameter(1, Types.OTHER);
+            statement.execute();
 
-        ResultSet resultSet = (ResultSet) statement.getObject(1);
+            ResultSet resultSet = (ResultSet) statement.getObject(1);
 
-        while (resultSet.next()) {
-            int id = resultSet.getInt(1);
-            int idPack = resultSet.getInt(2);
-            int idTransportService = resultSet.getInt(3);
+            while (resultSet.next()) {
+                int id = resultSet.getInt(1);
+                int idPack = resultSet.getInt(2);
+                int idTransportService = resultSet.getInt(3);
 
-            TouristPackDto touristPack = touristPackService.getTouristPackById(idPack);
-            TransportServiceDto transportService = transportServiceService.getTransportServiceById(idTransportService);
+                TouristPackDto touristPack = touristPackService.getTouristPackById(idPack);
+                TransportServiceDto transportService = transportServiceService
+                        .getTransportServiceById(idTransportService);
 
-            TransportServiceTouristPackDto dto = new TransportServiceTouristPackDto(id, transportService, touristPack);
-            list.add(dto);
+                TransportServiceTouristPackDto dto = new TransportServiceTouristPackDto(id, transportService,
+                        touristPack);
+                list.add(dto);
+            }
         }
 
         return list;
@@ -66,22 +69,25 @@ public class TransportServiceTouristPackServiceImpl implements ITransportService
             throws SQLException {
         TransportServiceTouristPackDto transportServiceTouristPack = null;
 
-        PreparedStatement pstmt = jdbcTemplate.getDataSource().getConnection().prepareStatement(
-                "SELECT * FROM transport_service_tourist_pack where id_transport_service_tourist_pack = ?");
+        try (Connection connection = jdbcTemplate.getDataSource().getConnection()) {
+            PreparedStatement pstmt = connection.prepareStatement(
+                    "SELECT * FROM transport_service_tourist_pack where id_transport_service_tourist_pack = ?");
 
-        pstmt.setInt(1, idTransportServiceTouristPack);
+            pstmt.setInt(1, idTransportServiceTouristPack);
 
-        ResultSet resultSet = pstmt.executeQuery();
+            ResultSet resultSet = pstmt.executeQuery();
 
-        while (resultSet.next()) {
-            int idTouristPack = resultSet.getInt(1);
-            int idTransportService = resultSet.getInt(2);
+            while (resultSet.next()) {
+                int idTouristPack = resultSet.getInt(1);
+                int idTransportService = resultSet.getInt(2);
 
-            TouristPackDto touristPack = touristPackService.getTouristPackById(idTouristPack);
-            TransportServiceDto transportService = transportServiceService.getTransportServiceById(idTransportService);
+                TouristPackDto touristPack = touristPackService.getTouristPackById(idTouristPack);
+                TransportServiceDto transportService = transportServiceService
+                        .getTransportServiceById(idTransportService);
 
-            transportServiceTouristPack = new TransportServiceTouristPackDto(idTransportServiceTouristPack,
-                    transportService, touristPack);
+                transportServiceTouristPack = new TransportServiceTouristPackDto(idTransportServiceTouristPack,
+                        transportService, touristPack);
+            }
         }
 
         return transportServiceTouristPack;
@@ -92,10 +98,12 @@ public class TransportServiceTouristPackServiceImpl implements ITransportService
             throws SQLException {
         String function = "{call transport_service_tourist_pack_insert(?)}";
 
-        CallableStatement statement = jdbcTemplate.getDataSource().getConnection().prepareCall(function);
-        statement.setInt(1, transportServiceTouristPack.getTouristPack().getIdTouristPack());
-        statement.setInt(2, transportServiceTouristPack.getTransportService().getIdTransportService());
-        statement.execute();
+        try (Connection connection = jdbcTemplate.getDataSource().getConnection()) {
+            CallableStatement statement = connection.prepareCall(function);
+            statement.setInt(1, transportServiceTouristPack.getTouristPack().getIdTouristPack());
+            statement.setInt(2, transportServiceTouristPack.getTransportService().getIdTransportService());
+            statement.execute();
+        }
     }
 
     @Override
@@ -103,11 +111,13 @@ public class TransportServiceTouristPackServiceImpl implements ITransportService
             throws SQLException {
         String function = "{call transport_service_tourist_pack_update(?,?)}";
 
-        CallableStatement statement = jdbcTemplate.getDataSource().getConnection().prepareCall(function);
-        statement.setInt(1, transportServiceTouristPack.getIdTransportServiceTouristPack());
-        statement.setInt(2, transportServiceTouristPack.getTouristPack().getIdTouristPack());
-        statement.setInt(3, transportServiceTouristPack.getTransportService().getIdTransportService());
-        statement.execute();
+        try (Connection connection = jdbcTemplate.getDataSource().getConnection()) {
+            CallableStatement statement = connection.prepareCall(function);
+            statement.setInt(1, transportServiceTouristPack.getIdTransportServiceTouristPack());
+            statement.setInt(2, transportServiceTouristPack.getTouristPack().getIdTouristPack());
+            statement.setInt(3, transportServiceTouristPack.getTransportService().getIdTransportService());
+            statement.execute();
+        }
 
     }
 
@@ -115,9 +125,11 @@ public class TransportServiceTouristPackServiceImpl implements ITransportService
     public void deleteTransportServiceTouristPack(int idTransportServiceTouristPack) throws SQLException {
         String function = "{call transport_service_tourist_pack_delete(?)}";
 
-        CallableStatement statement = jdbcTemplate.getDataSource().getConnection().prepareCall(function);
-        statement.setInt(1, idTransportServiceTouristPack);
-        statement.execute();
+        try (Connection connection = jdbcTemplate.getDataSource().getConnection()) {
+            CallableStatement statement = connection.prepareCall(function);
+            statement.setInt(1, idTransportServiceTouristPack);
+            statement.execute();
+        }
 
     }
 

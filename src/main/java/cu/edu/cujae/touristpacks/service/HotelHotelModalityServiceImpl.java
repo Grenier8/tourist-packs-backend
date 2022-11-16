@@ -38,24 +38,25 @@ public class HotelHotelModalityServiceImpl implements IHotelHotelModalityService
 
         String function = "{?= call select_all_hotel_hotel_modality()}";
 
-        Connection connection = jdbcTemplate.getDataSource().getConnection();
-        connection.setAutoCommit(false);
-        CallableStatement statement = connection.prepareCall(function);
-        statement.registerOutParameter(1, Types.OTHER);
-        statement.execute();
+        try (Connection connection = jdbcTemplate.getDataSource().getConnection()) {
+            connection.setAutoCommit(false);
+            CallableStatement statement = connection.prepareCall(function);
+            statement.registerOutParameter(1, Types.OTHER);
+            statement.execute();
 
-        ResultSet resultSet = (ResultSet) statement.getObject(1);
+            ResultSet resultSet = (ResultSet) statement.getObject(1);
 
-        while (resultSet.next()) {
-            int id = resultSet.getInt(1);
-            int idHotel = resultSet.getInt(2);
-            int idModality = resultSet.getInt(3);
+            while (resultSet.next()) {
+                int id = resultSet.getInt(1);
+                int idHotel = resultSet.getInt(2);
+                int idModality = resultSet.getInt(3);
 
-            HotelDto hotel = hotelService.getHotelById(idHotel);
-            HotelModalityDto hotelModality = hotelModalityService.getHotelModalityById(idModality);
+                HotelDto hotel = hotelService.getHotelById(idHotel);
+                HotelModalityDto hotelModality = hotelModalityService.getHotelModalityById(idModality);
 
-            HotelHotelModalityDto dto = new HotelHotelModalityDto(id, hotel, hotelModality);
-            list.add(dto);
+                HotelHotelModalityDto dto = new HotelHotelModalityDto(id, hotel, hotelModality);
+                list.add(dto);
+            }
         }
 
         return list;
@@ -65,47 +66,52 @@ public class HotelHotelModalityServiceImpl implements IHotelHotelModalityService
     public HotelHotelModalityDto getHotelHotelModalityById(int idHotelHotelModality) throws SQLException {
         HotelHotelModalityDto hotelHotelModality = null;
 
-        PreparedStatement pstmt = jdbcTemplate.getDataSource().getConnection().prepareStatement(
-                "SELECT * FROM hotel_hotel_modality where id_hotel_hotel_modality = ?");
+        try (Connection connection = jdbcTemplate.getDataSource().getConnection()) {
+            PreparedStatement pstmt = connection.prepareStatement(
+                    "SELECT * FROM hotel_hotel_modality where id_hotel_hotel_modality = ?");
 
-        pstmt.setInt(1, idHotelHotelModality);
+            pstmt.setInt(1, idHotelHotelModality);
 
-        ResultSet resultSet = pstmt.executeQuery();
+            ResultSet resultSet = pstmt.executeQuery();
 
-        while (resultSet.next()) {
-            int idHotel = resultSet.getInt(2);
-            int idModality = resultSet.getInt(3);
+            while (resultSet.next()) {
+                int idHotel = resultSet.getInt(2);
+                int idModality = resultSet.getInt(3);
 
-            HotelDto hotel = hotelService.getHotelById(idHotel);
-            HotelModalityDto hotelModality = hotelModalityService.getHotelModalityById(idModality);
+                HotelDto hotel = hotelService.getHotelById(idHotel);
+                HotelModalityDto hotelModality = hotelModalityService.getHotelModalityById(idModality);
 
-            hotelHotelModality = new HotelHotelModalityDto(idHotelHotelModality, hotel, hotelModality);
+                hotelHotelModality = new HotelHotelModalityDto(idHotelHotelModality, hotel, hotelModality);
 
+            }
         }
-
         return hotelHotelModality;
     }
 
     @Override
     public void createHotelHotelModality(HotelHotelModalityDto hotelHotelModality) throws SQLException {
-        String function = "{call hotel_hotel_modality_insert(?)}";
+        String function = "{call hotel_hotel_modality_insert(?,?)}";
 
-        CallableStatement statement = jdbcTemplate.getDataSource().getConnection().prepareCall(function);
-        statement.setInt(1, hotelHotelModality.getHotel().getIdHotel());
-        statement.setInt(1, hotelHotelModality.getHotelModality().getIdHotelModality());
-        statement.execute();
+        try (Connection connection = jdbcTemplate.getDataSource().getConnection()) {
+            CallableStatement statement = connection.prepareCall(function);
+            statement.setInt(1, hotelHotelModality.getHotel().getIdHotel());
+            statement.setInt(2, hotelHotelModality.getHotelModality().getIdHotelModality());
+            statement.execute();
+        }
 
     }
 
     @Override
     public void updateHotelHotelModality(HotelHotelModalityDto hotelHotelModality) throws SQLException {
-        String function = "{call hotel_hotel_modality_update(?,?)}";
+        String function = "{call hotel_hotel_modality_update(?,?,?)}";
 
-        CallableStatement statement = jdbcTemplate.getDataSource().getConnection().prepareCall(function);
-        statement.setInt(1, hotelHotelModality.getIdHotelHotelModality());
-        statement.setInt(2, hotelHotelModality.getHotel().getIdHotel());
-        statement.setInt(2, hotelHotelModality.getHotelModality().getIdHotelModality());
-        statement.execute();
+        try (Connection connection = jdbcTemplate.getDataSource().getConnection()) {
+            CallableStatement statement = connection.prepareCall(function);
+            statement.setInt(1, hotelHotelModality.getIdHotelHotelModality());
+            statement.setInt(2, hotelHotelModality.getHotel().getIdHotel());
+            statement.setInt(3, hotelHotelModality.getHotelModality().getIdHotelModality());
+            statement.execute();
+        }
 
     }
 
@@ -113,10 +119,11 @@ public class HotelHotelModalityServiceImpl implements IHotelHotelModalityService
     public void deleteHotelHotelModality(int idHotelHotelModality) throws SQLException {
         String function = "{call hotel_hotel_modality_delete(?)}";
 
-        CallableStatement statement = jdbcTemplate.getDataSource().getConnection().prepareCall(function);
-        statement.setInt(1, idHotelHotelModality);
-        statement.execute();
-
+        try (Connection connection = jdbcTemplate.getDataSource().getConnection()) {
+            CallableStatement statement = connection.prepareCall(function);
+            statement.setInt(1, idHotelHotelModality);
+            statement.execute();
+        }
     }
 
 }
