@@ -13,33 +13,25 @@ public class OtherServiceContractDto extends ContractDto {
 	public OtherServiceContractDto() {
 	}
 
-	public OtherServiceContractDto(int idOtherServiceContract, String contractDescription, double costPerPax,
+	public OtherServiceContractDto(int idOtherServiceContract, int idContract, String contractTitle,
+			LocalDate startDate, LocalDate endDate, LocalDate conciliationDate, String contractDescription,
+			double costPerPax,
 			ServiceTypeDto serviceType, ProvinceDto province) {
-		this.idOtherServiceContract = idOtherServiceContract;
-		this.contractDescription = contractDescription;
-		this.costPerPax = costPerPax;
-		this.serviceType = serviceType;
-		this.province = province;
-	}
-
-	public OtherServiceContractDto(int idOtherServiceContract, String contractTitle, LocalDate startDate,
-			LocalDate endDate, LocalDate conciliationDate, String contractDescription, double costPerPax,
-			ServiceTypeDto serviceType, ProvinceDto province) {
-		super(contractTitle, startDate, endDate, conciliationDate);
-
-		this.idOtherServiceContract = idOtherServiceContract;
-		this.contractDescription = contractDescription;
-		this.costPerPax = costPerPax;
-		this.serviceType = serviceType;
-		this.province = province;
-	}
-
-	public OtherServiceContractDto(int idOtherServiceContract, String contractTitle, LocalDate startDate,
-			LocalDate endDate, LocalDate conciliationDate, String contractDescription, double costPerPax,
-			ServiceTypeDto serviceType, ProvinceDto province, int idContract) {
 		super(idContract, contractTitle, startDate, endDate, conciliationDate);
 
 		this.idOtherServiceContract = idOtherServiceContract;
+		this.contractDescription = contractDescription;
+		this.costPerPax = costPerPax;
+		this.serviceType = serviceType;
+		this.province = province;
+	}
+
+	public OtherServiceContractDto(int idContract, String contractTitle,
+			LocalDate startDate, LocalDate endDate, LocalDate conciliationDate, String contractDescription,
+			double costPerPax,
+			ServiceTypeDto serviceType, ProvinceDto province) {
+		super(idContract, contractTitle, startDate, endDate, conciliationDate);
+
 		this.contractDescription = contractDescription;
 		this.costPerPax = costPerPax;
 		this.serviceType = serviceType;

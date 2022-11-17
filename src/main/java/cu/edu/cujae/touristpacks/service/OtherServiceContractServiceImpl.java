@@ -72,9 +72,9 @@ public class OtherServiceContractServiceImpl implements IOtherServiceContractSer
                 ProvinceDto province = provinceService.getProvinceById(idProvince);
 
                 OtherServiceContractDto otherServiceContract = new OtherServiceContractDto(idOtherServiceContract,
+                        idContract,
                         contractTitle,
-                        startDate, endDate, conciliationDate, contractDescription, costPerPax, serviceType, province,
-                        idContract);
+                        startDate, endDate, conciliationDate, contractDescription, costPerPax, serviceType, province);
 
                 list.add(otherServiceContract);
             }
@@ -113,10 +113,9 @@ public class OtherServiceContractServiceImpl implements IOtherServiceContractSer
                 ServiceTypeDto serviceType = serviceTypeService.getServiceTypeById(idServiceType);
                 ProvinceDto province = provinceService.getProvinceById(idProvince);
 
-                otherServiceContract = new OtherServiceContractDto(idOtherServiceContract,
+                otherServiceContract = new OtherServiceContractDto(idOtherServiceContract, idContract,
                         contractTitle,
-                        startDate, endDate, conciliationDate, contractDescription, costPerPax, serviceType, province,
-                        idContract);
+                        startDate, endDate, conciliationDate, contractDescription, costPerPax, serviceType, province);
             }
         }
 
@@ -154,10 +153,9 @@ public class OtherServiceContractServiceImpl implements IOtherServiceContractSer
                 ServiceTypeDto serviceType = serviceTypeService.getServiceTypeById(idServiceType);
                 ProvinceDto province = provinceService.getProvinceById(idProvince);
 
-                otherServiceContract = new OtherServiceContractDto(idOtherServiceContract,
+                otherServiceContract = new OtherServiceContractDto(idOtherServiceContract, idContract,
                         contractTitle,
-                        startDate, endDate, conciliationDate, contractDescription, costPerPax, serviceType, province,
-                        idContract);
+                        startDate, endDate, conciliationDate, contractDescription, costPerPax, serviceType, province);
             }
         }
 
@@ -185,10 +183,10 @@ public class OtherServiceContractServiceImpl implements IOtherServiceContractSer
 
     @Override
     public void updateOtherServiceContract(OtherServiceContractDto otherServiceContract) throws SQLException {
-        otherServiceContract.setIdContract(
-                getOtherServiceContractById(otherServiceContract.getIdOtherServiceContract()).getIdContract());
+        
+        int idContract = getOtherServiceContractById(otherServiceContract.getIdOtherServiceContract()).getIdContract();
+        otherServiceContract.setIdContract(idContract);
         contractService.updateContract(otherServiceContract);
-        int idContract = contractService.getContractByTitle(otherServiceContract.getContractTitle()).getIdContract();
 
         String function = "{call other_service_contract_update(?,?,?,?,?,?)}";
 
@@ -199,7 +197,7 @@ public class OtherServiceContractServiceImpl implements IOtherServiceContractSer
             statement.setDouble(3, otherServiceContract.getCostPerPax());
             statement.setInt(4, otherServiceContract.getServiceType().getIdServiceType());
             statement.setInt(5, otherServiceContract.getProvince().getIdProvince());
-            statement.setInt(6, idContract);
+            statement.setInt(6, otherServiceContract.getIdContract());
             statement.execute();
         }
     }
