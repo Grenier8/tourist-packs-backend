@@ -121,3 +121,13 @@ target/classes/cu/edu/cujae/touristpacks/api/controller/RoomPlanSeasonController
 target/classes/cu/edu/cujae/touristpacks/api/controller/RoomTypeController.class
 target/classes/cu/edu/cujae/touristpacks/api/controller/SeasonController.class
 target/classes/cu/edu/cujae/touristpacks/api/controller/ServiceTypeController.class
+target/classes/cu/edu/cujae/touristpacks/api/controller/ProviderController.class
+target/classes/cu/edu/cujae/touristpacks/api/controller/TmHourKmController.class
+target/classes/cu/edu/cujae/touristpacks/api/controller/TmKmController.class
+target/classes/cu/edu/cujae/touristpacks/api/controller/TmTravelController.class
+target/classes/cu/edu/cujae/touristpacks/api/controller/TransportContractController.class
+target/classes/cu/edu/cujae/touristpacks/api/controller/TransportContractTransportServiceController.class
+target/classes/cu/edu/cujae/touristpacks/api/controller/TransportModalityController.class
+target/classes/cu/edu/cujae/touristpacks/api/controller/TransportServiceController.class
+target/classes/cu/edu/cujae/touristpacks/api/controller/TravelController.class
+target/classes/cu/edu/cujae/touristpacks/api/controller/VehicleController.class
