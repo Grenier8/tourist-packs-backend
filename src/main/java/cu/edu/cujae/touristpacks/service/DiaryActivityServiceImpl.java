@@ -30,23 +30,24 @@ public class DiaryActivityServiceImpl implements IDiaryActivityService {
 
         String function = "{?= call select_all_diary_activity()}";
 
-        Connection connection = jdbcTemplate.getDataSource().getConnection();
-        connection.setAutoCommit(false);
-        CallableStatement statement = connection.prepareCall(function);
-        statement.registerOutParameter(1, Types.OTHER);
-        statement.execute();
+        try (Connection connection = jdbcTemplate.getDataSource().getConnection()) {
+            connection.setAutoCommit(false);
+            CallableStatement statement = connection.prepareCall(function);
+            statement.registerOutParameter(1, Types.OTHER);
+            statement.execute();
 
-        ResultSet resultSet = (ResultSet) statement.getObject(1);
+            ResultSet resultSet = (ResultSet) statement.getObject(1);
 
-        while (resultSet.next()) {
-            int idActivity = resultSet.getInt(1);
-            LocalDate date = resultSet.getDate(2).toLocalDate();
-            String activityDescription = resultSet.getString(3);
-            String activityName = resultSet.getString(4);
+            while (resultSet.next()) {
+                int idActivity = resultSet.getInt(1);
+                LocalDate date = resultSet.getDate(2).toLocalDate();
+                String activityDescription = resultSet.getString(3);
+                String activityName = resultSet.getString(4);
 
-            DiaryActivityDto diaryActivity = new DiaryActivityDto(idActivity, activityName, date,
-                    activityDescription);
-            list.add(diaryActivity);
+                DiaryActivityDto diaryActivity = new DiaryActivityDto(idActivity, activityName, date,
+                        activityDescription);
+                list.add(diaryActivity);
+            }
         }
 
         return list;
@@ -56,21 +57,22 @@ public class DiaryActivityServiceImpl implements IDiaryActivityService {
     public DiaryActivityDto getDiaryActivityById(int idDiaryActivity) throws SQLException {
         DiaryActivityDto diaryActivity = null;
 
-        PreparedStatement pstmt = jdbcTemplate.getDataSource().getConnection().prepareStatement(
-                "SELECT * FROM diary_activity where id_activity = ?");
+        try (Connection connection = jdbcTemplate.getDataSource().getConnection()) {
+            PreparedStatement pstmt = connection.prepareStatement(
+                    "SELECT * FROM diary_activity where id_activity = ?");
 
-        pstmt.setInt(1, idDiaryActivity);
+            pstmt.setInt(1, idDiaryActivity);
 
-        ResultSet resultSet = pstmt.executeQuery();
+            ResultSet resultSet = pstmt.executeQuery();
 
-        while (resultSet.next()) {
-            LocalDate date = resultSet.getDate(2).toLocalDate();
-            String activityDescription = resultSet.getString(3);
-            String activityName = resultSet.getString(4);
+            while (resultSet.next()) {
+                LocalDate date = resultSet.getDate(2).toLocalDate();
+                String activityDescription = resultSet.getString(3);
+                String activityName = resultSet.getString(4);
 
-            diaryActivity = new DiaryActivityDto(idDiaryActivity, activityName, date, activityDescription);
+                diaryActivity = new DiaryActivityDto(idDiaryActivity, activityName, date, activityDescription);
+            }
         }
-
         return diaryActivity;
     }
 
@@ -78,21 +80,22 @@ public class DiaryActivityServiceImpl implements IDiaryActivityService {
     public DiaryActivityDto getDiaryActivityByName(String diaryActivityName) throws SQLException {
         DiaryActivityDto diaryActivity = null;
 
-        PreparedStatement pstmt = jdbcTemplate.getDataSource().getConnection().prepareStatement(
-                "SELECT * FROM diary_activity where activity_name = ?");
+        try (Connection connection = jdbcTemplate.getDataSource().getConnection()) {
+            PreparedStatement pstmt = connection.prepareStatement(
+                    "SELECT * FROM diary_activity where activity_name = ?");
 
-        pstmt.setString(1, diaryActivityName);
+            pstmt.setString(1, diaryActivityName);
 
-        ResultSet resultSet = pstmt.executeQuery();
+            ResultSet resultSet = pstmt.executeQuery();
 
-        while (resultSet.next()) {
-            int idDiaryActivity = resultSet.getInt(1);
-            LocalDate date = resultSet.getDate(2).toLocalDate();
-            String activityDescription = resultSet.getString(3);
+            while (resultSet.next()) {
+                int idDiaryActivity = resultSet.getInt(1);
+                LocalDate date = resultSet.getDate(2).toLocalDate();
+                String activityDescription = resultSet.getString(3);
 
-            diaryActivity = new DiaryActivityDto(idDiaryActivity, diaryActivityName, date, activityDescription);
+                diaryActivity = new DiaryActivityDto(idDiaryActivity, diaryActivityName, date, activityDescription);
+            }
         }
-
         return diaryActivity;
     }
 
@@ -100,11 +103,13 @@ public class DiaryActivityServiceImpl implements IDiaryActivityService {
     public void createDiaryActivity(DiaryActivityDto diaryActivity) throws SQLException {
         String function = "{call diary_activity_insert(?,?,?)}";
 
-        CallableStatement statement = jdbcTemplate.getDataSource().getConnection().prepareCall(function);
-        statement.setDate(1, Date.valueOf(diaryActivity.getDate()));
-        statement.setString(2, diaryActivity.getDescription());
-        statement.setString(3, diaryActivity.getDiaryActivityName());
-        statement.execute();
+        try (Connection connection = jdbcTemplate.getDataSource().getConnection()) {
+            CallableStatement statement = connection.prepareCall(function);
+            statement.setDate(1, Date.valueOf(diaryActivity.getDate()));
+            statement.setString(2, diaryActivity.getDescription());
+            statement.setString(3, diaryActivity.getDiaryActivityName());
+            statement.execute();
+        }
 
     }
 
@@ -112,21 +117,25 @@ public class DiaryActivityServiceImpl implements IDiaryActivityService {
     public void updateDiaryActivity(DiaryActivityDto diaryActivity) throws SQLException {
         String function = "{call diary_activity_update(?,?,?,?)}";
 
-        CallableStatement statement = jdbcTemplate.getDataSource().getConnection().prepareCall(function);
-        statement.setInt(1, diaryActivity.getIdDiaryActivity());
-        statement.setDate(2, Date.valueOf(diaryActivity.getDate()));
-        statement.setString(3, diaryActivity.getDescription());
-        statement.setString(4, diaryActivity.getDiaryActivityName());
-        statement.execute();
+        try (Connection connection = jdbcTemplate.getDataSource().getConnection()) {
+            CallableStatement statement = connection.prepareCall(function);
+            statement.setInt(1, diaryActivity.getIdDiaryActivity());
+            statement.setDate(2, Date.valueOf(diaryActivity.getDate()));
+            statement.setString(3, diaryActivity.getDescription());
+            statement.setString(4, diaryActivity.getDiaryActivityName());
+            statement.execute();
+        }
     }
 
     @Override
     public void deleteDiaryActivity(int idDiaryActivity) throws SQLException {
         String function = "{call diary_activity_delete(?)}";
 
-        CallableStatement statement = jdbcTemplate.getDataSource().getConnection().prepareCall(function);
-        statement.setInt(1, idDiaryActivity);
-        statement.execute();
+        try (Connection connection = jdbcTemplate.getDataSource().getConnection()) {
+            CallableStatement statement = connection.prepareCall(function);
+            statement.setInt(1, idDiaryActivity);
+            statement.execute();
+        }
     }
 
 }

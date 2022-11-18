@@ -28,10 +28,10 @@ public class HotelContractServiceImpl implements IHotelContractService {
     private JdbcTemplate jdbcTemplate;
 
     @Autowired
-    IHotelService hotelService;
+    private IHotelService hotelService;
 
     @Autowired
-    IContractService contractService;
+    private IContractService contractService;
 
     @Override
     public List<HotelContractDto> getHotelContracts() throws SQLException {

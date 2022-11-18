@@ -28,20 +28,21 @@ public class ServiceTypeServiceImpl implements IServiceTypeService {
 
         String function = "{?= call select_all_service_type()}";
 
-        Connection connection = jdbcTemplate.getDataSource().getConnection();
-        connection.setAutoCommit(false);
-        CallableStatement statement = connection.prepareCall(function);
-        statement.registerOutParameter(1, Types.OTHER);
-        statement.execute();
+        try (Connection connection = jdbcTemplate.getDataSource().getConnection()) {
+            connection.setAutoCommit(false);
+            CallableStatement statement = connection.prepareCall(function);
+            statement.registerOutParameter(1, Types.OTHER);
+            statement.execute();
 
-        ResultSet resultSet = (ResultSet) statement.getObject(1);
+            ResultSet resultSet = (ResultSet) statement.getObject(1);
 
-        while (resultSet.next()) {
-            int idServiceType = resultSet.getInt(1);
-            String serviceTypeName = resultSet.getString(2);
+            while (resultSet.next()) {
+                int idServiceType = resultSet.getInt(1);
+                String serviceTypeName = resultSet.getString(2);
 
-            ServiceTypeDto dto = new ServiceTypeDto(idServiceType, serviceTypeName);
-            list.add(dto);
+                ServiceTypeDto dto = new ServiceTypeDto(idServiceType, serviceTypeName);
+                list.add(dto);
+            }
         }
 
         return list;
@@ -51,19 +52,20 @@ public class ServiceTypeServiceImpl implements IServiceTypeService {
     public ServiceTypeDto getServiceTypeById(int idServiceType) throws SQLException {
         ServiceTypeDto serviceType = null;
 
-        PreparedStatement pstmt = jdbcTemplate.getDataSource().getConnection().prepareStatement(
-                "SELECT * FROM service_type where id_service_type = ?");
+        try (Connection connection = jdbcTemplate.getDataSource().getConnection()) {
+            PreparedStatement pstmt = connection.prepareStatement(
+                    "SELECT * FROM service_type where id_service_type = ?");
 
-        pstmt.setInt(1, idServiceType);
+            pstmt.setInt(1, idServiceType);
 
-        ResultSet resultSet = pstmt.executeQuery();
+            ResultSet resultSet = pstmt.executeQuery();
 
-        while (resultSet.next()) {
-            String serviceTypeName = resultSet.getString(2);
+            while (resultSet.next()) {
+                String serviceTypeName = resultSet.getString(2);
 
-            serviceType = new ServiceTypeDto(idServiceType, serviceTypeName);
+                serviceType = new ServiceTypeDto(idServiceType, serviceTypeName);
+            }
         }
-
         return serviceType;
     }
 
@@ -71,19 +73,20 @@ public class ServiceTypeServiceImpl implements IServiceTypeService {
     public ServiceTypeDto getServiceTypeByName(String serviceTypeName) throws SQLException {
         ServiceTypeDto serviceType = null;
 
-        PreparedStatement pstmt = jdbcTemplate.getDataSource().getConnection().prepareStatement(
-                "SELECT * FROM service_type where service_type_name = ?");
+        try (Connection connection = jdbcTemplate.getDataSource().getConnection()) {
+            PreparedStatement pstmt = connection.prepareStatement(
+                    "SELECT * FROM service_type where service_type_name = ?");
 
-        pstmt.setString(1, serviceTypeName);
+            pstmt.setString(1, serviceTypeName);
 
-        ResultSet resultSet = pstmt.executeQuery();
+            ResultSet resultSet = pstmt.executeQuery();
 
-        while (resultSet.next()) {
-            int idServiceType = resultSet.getInt(2);
+            while (resultSet.next()) {
+                int idServiceType = resultSet.getInt(2);
 
-            serviceType = new ServiceTypeDto(idServiceType, serviceTypeName);
+                serviceType = new ServiceTypeDto(idServiceType, serviceTypeName);
+            }
         }
-
         return serviceType;
     }
 
@@ -91,9 +94,11 @@ public class ServiceTypeServiceImpl implements IServiceTypeService {
     public void createServiceType(ServiceTypeDto serviceType) throws SQLException {
         String function = "{call service_type_insert(?)}";
 
-        CallableStatement statement = jdbcTemplate.getDataSource().getConnection().prepareCall(function);
-        statement.setString(1, serviceType.getServiceTypeName());
-        statement.execute();
+        try (Connection connection = jdbcTemplate.getDataSource().getConnection()) {
+            CallableStatement statement = connection.prepareCall(function);
+            statement.setString(1, serviceType.getServiceTypeName());
+            statement.execute();
+        }
 
     }
 
@@ -101,10 +106,12 @@ public class ServiceTypeServiceImpl implements IServiceTypeService {
     public void updateServiceType(ServiceTypeDto serviceType) throws SQLException {
         String function = "{call service_type_update(?,?)}";
 
-        CallableStatement statement = jdbcTemplate.getDataSource().getConnection().prepareCall(function);
-        statement.setInt(1, serviceType.getIdServiceType());
-        statement.setString(2, serviceType.getServiceTypeName());
-        statement.execute();
+        try (Connection connection = jdbcTemplate.getDataSource().getConnection()) {
+            CallableStatement statement = connection.prepareCall(function);
+            statement.setInt(1, serviceType.getIdServiceType());
+            statement.setString(2, serviceType.getServiceTypeName());
+            statement.execute();
+        }
 
     }
 
@@ -112,9 +119,11 @@ public class ServiceTypeServiceImpl implements IServiceTypeService {
     public void deleteServiceType(int idServiceType) throws SQLException {
         String function = "{call service_type_delete(?)}";
 
-        CallableStatement statement = jdbcTemplate.getDataSource().getConnection().prepareCall(function);
-        statement.setInt(1, idServiceType);
-        statement.execute();
+        try (Connection connection = jdbcTemplate.getDataSource().getConnection()) {
+            CallableStatement statement = connection.prepareCall(function);
+            statement.setInt(1, idServiceType);
+            statement.execute();
+        }
 
     }
 

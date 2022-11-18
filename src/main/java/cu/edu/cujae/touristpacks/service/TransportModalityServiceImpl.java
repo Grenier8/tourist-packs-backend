@@ -19,105 +19,106 @@ import org.springframework.stereotype.Service;
 @Service
 public class TransportModalityServiceImpl implements ITransportModalityService {
 
-	@Autowired
+    @Autowired
     private JdbcTemplate jdbcTemplate;
-	
+
     @Override
-    public List<TransportModalityDto> getTransportModalities() throws SQLException{
-       	List<TransportModalityDto> list = new ArrayList<>();
+    public List<TransportModalityDto> getTransportModalities() throws SQLException {
+        List<TransportModalityDto> list = new ArrayList<>();
 
         String function = "{?= call select_all_transp_modality()}";
 
-        try(Connection connection = jdbcTemplate.getDataSource().getConnection()){
-        connection.setAutoCommit(false);
-        CallableStatement statement = connection.prepareCall(function);
-        statement.registerOutParameter(1, Types.OTHER);
-        statement.execute();
+        try (Connection connection = jdbcTemplate.getDataSource().getConnection()) {
+            connection.setAutoCommit(false);
+            CallableStatement statement = connection.prepareCall(function);
+            statement.registerOutParameter(1, Types.OTHER);
+            statement.execute();
 
-        ResultSet resultSet = (ResultSet) statement.getObject(1);
+            ResultSet resultSet = (ResultSet) statement.getObject(1);
 
-        while (resultSet.next()) {
-        	int id_tmodality = resultSet.getInt(1);
-            String tmodality_name = resultSet.getString(2);
-            TransportModalityDto transporModality = new TransportModalityDto(id_tmodality, tmodality_name);
+            while (resultSet.next()) {
+                int id_tmodality = resultSet.getInt(1);
+                String tmodality_name = resultSet.getString(2);
+                TransportModalityDto transporModality = new TransportModalityDto(id_tmodality, tmodality_name);
 
-            list.add(transporModality);
-        }
+                list.add(transporModality);
+            }
         }
         return list;
     }
 
     @Override
-    public TransportModalityDto getTransportModalityById(int transportModalityId) throws SQLException{
-    	TransportModalityDto tmodality = null;
+    public TransportModalityDto getTransportModalityById(int transportModalityId) throws SQLException {
+        TransportModalityDto tmodality = null;
 
-        try(PreparedStatement pstmt = jdbcTemplate.getDataSource().getConnection().prepareStatement(
-                "SELECT * FROM transp_modality where id_tmodality = ?")){
+        try (Connection connection = jdbcTemplate.getDataSource().getConnection()) {
+            PreparedStatement pstmt = connection.prepareStatement(
+                    "SELECT * FROM transp_modality where id_tmodality = ?");
 
-        pstmt.setInt(1, transportModalityId);
+            pstmt.setInt(1, transportModalityId);
 
-        ResultSet resultSet = pstmt.executeQuery();
+            ResultSet resultSet = pstmt.executeQuery();
 
-        while (resultSet.next()) {
-        	
-            String tmodalityName = resultSet.getString(2);
+            while (resultSet.next()) {
 
-            tmodality = new TransportModalityDto(transportModalityId, tmodalityName);
-        }
-        }
-        return tmodality;
-    }
+                String tmodalityName = resultSet.getString(2);
 
-    @Override
-    public TransportModalityDto getTransportModalityByName(String transportModalityName) throws SQLException{
-    	TransportModalityDto tmodality = null;
-
-        try(PreparedStatement pstmt = jdbcTemplate.getDataSource().getConnection().prepareStatement(
-                "SELECT * FROM transp_modality where tmodality_name = ?")){
-
-        pstmt.setString(1, transportModalityName);
-
-        ResultSet resultSet = pstmt.executeQuery();
-
-        while (resultSet.next()) {
-        	
-            int tmodalityId = resultSet.getInt(1);
-
-            tmodality = new TransportModalityDto(tmodalityId, transportModalityName);
-        }
+                tmodality = new TransportModalityDto(transportModalityId, tmodalityName);
+            }
         }
         return tmodality;
     }
 
     @Override
-    public void createTransportModality(TransportModalityDto transportModality) throws SQLException{
+    public TransportModalityDto getTransportModalityByName(String transportModalityName) throws SQLException {
+        TransportModalityDto tmodality = null;
+
+        try (PreparedStatement pstmt = jdbcTemplate.getDataSource().getConnection().prepareStatement(
+                "SELECT * FROM transp_modality where tmodality_name = ?")) {
+
+            pstmt.setString(1, transportModalityName);
+
+            ResultSet resultSet = pstmt.executeQuery();
+
+            while (resultSet.next()) {
+
+                int tmodalityId = resultSet.getInt(1);
+
+                tmodality = new TransportModalityDto(tmodalityId, transportModalityName);
+            }
+        }
+        return tmodality;
+    }
+
+    @Override
+    public void createTransportModality(TransportModalityDto transportModality) throws SQLException {
         String function = "{call transp_modality_insert(?)}";
 
-        try(CallableStatement statement = jdbcTemplate.getDataSource().getConnection().prepareCall(function)){
-        
-        statement.setString(1, transportModality.getTransportModalityName());
-        statement.execute();
+        try (CallableStatement statement = jdbcTemplate.getDataSource().getConnection().prepareCall(function)) {
+
+            statement.setString(1, transportModality.getTransportModalityName());
+            statement.execute();
         }
     }
 
     @Override
-    public void updateTransportModality(TransportModalityDto transportModality) throws SQLException{
+    public void updateTransportModality(TransportModalityDto transportModality) throws SQLException {
         String function = "{call transp_modality_update(?,?)}";
 
-        try(CallableStatement statement = jdbcTemplate.getDataSource().getConnection().prepareCall(function)){
-        statement.setInt(1, transportModality.getIdTransportModality());
-        statement.setString(2, transportModality.getTransportModalityName());
-        statement.execute();
+        try (CallableStatement statement = jdbcTemplate.getDataSource().getConnection().prepareCall(function)) {
+            statement.setInt(1, transportModality.getIdTransportModality());
+            statement.setString(2, transportModality.getTransportModalityName());
+            statement.execute();
         }
     }
 
     @Override
-    public void deleteTransportModality(int idTransportModality) throws SQLException{
+    public void deleteTransportModality(int idTransportModality) throws SQLException {
         String function = "{call transp_modality_delete(?)}";
 
-        try(CallableStatement statement = jdbcTemplate.getDataSource().getConnection().prepareCall(function)){
-        statement.setInt(1, idTransportModality);
-        statement.execute();
+        try (CallableStatement statement = jdbcTemplate.getDataSource().getConnection().prepareCall(function)) {
+            statement.setInt(1, idTransportModality);
+            statement.execute();
         }
     }
 
