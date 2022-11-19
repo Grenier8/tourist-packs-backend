@@ -18,7 +18,7 @@ import cu.edu.cujae.touristpacks.core.dto.RoomPlanSeasonDto;
 import cu.edu.cujae.touristpacks.core.service.IRoomPlanSeasonService;
 
 @RestController
-@RequestMapping("/api/v1/roomPlanSeasons")
+@RequestMapping("/api/v1/room_plan_seasons")
 public class RoomPlanSeasonController {
 
     @Autowired

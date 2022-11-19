@@ -18,7 +18,7 @@ import cu.edu.cujae.touristpacks.core.dto.AlimentaryPlanDto;
 import cu.edu.cujae.touristpacks.core.service.IAlimentaryPlanService;
 
 @RestController
-@RequestMapping("/api/v1/alimentaryPlans")
+@RequestMapping("/api/v1/alimentary_plans")
 public class AlimentaryPlanController {
 
     @Autowired

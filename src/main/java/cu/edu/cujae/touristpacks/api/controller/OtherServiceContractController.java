@@ -18,7 +18,7 @@ import cu.edu.cujae.touristpacks.core.dto.OtherServiceContractDto;
 import cu.edu.cujae.touristpacks.core.service.IOtherServiceContractService;
 
 @RestController
-@RequestMapping("/api/v1/otherServiceContracts")
+@RequestMapping("/api/v1/other_service_contracts")
 public class OtherServiceContractController {
 
     @Autowired

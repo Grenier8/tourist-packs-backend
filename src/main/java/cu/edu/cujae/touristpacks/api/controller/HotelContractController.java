@@ -18,7 +18,7 @@ import cu.edu.cujae.touristpacks.core.dto.HotelContractDto;
 import cu.edu.cujae.touristpacks.core.service.IHotelContractService;
 
 @RestController
-@RequestMapping("/api/v1/hotelContracts")
+@RequestMapping("/api/v1/hotel_contracts")
 public class HotelContractController {
 
     @Autowired

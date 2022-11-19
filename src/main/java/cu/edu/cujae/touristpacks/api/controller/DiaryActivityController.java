@@ -18,7 +18,7 @@ import cu.edu.cujae.touristpacks.core.dto.DiaryActivityDto;
 import cu.edu.cujae.touristpacks.core.service.IDiaryActivityService;
 
 @RestController
-@RequestMapping("/api/v1/diaryActivities")
+@RequestMapping("/api/v1/diary_activities")
 public class DiaryActivityController {
 
     @Autowired
