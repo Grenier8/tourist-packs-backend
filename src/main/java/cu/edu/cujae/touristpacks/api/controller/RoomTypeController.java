@@ -18,7 +18,7 @@ import cu.edu.cujae.touristpacks.core.dto.RoomTypeDto;
 import cu.edu.cujae.touristpacks.core.service.IRoomTypeService;
 
 @RestController
-@RequestMapping("/api/v1/roomTypes")
+@RequestMapping("/api/v1/room_types")
 public class RoomTypeController {
 
     @Autowired

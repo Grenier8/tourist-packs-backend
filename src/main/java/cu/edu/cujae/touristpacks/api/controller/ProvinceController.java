@@ -12,6 +12,7 @@ import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.PutMapping;
 import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
+import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.RestController;
 
 import cu.edu.cujae.touristpacks.core.dto.ProvinceDto;
@@ -33,6 +34,19 @@ public class ProvinceController {
     @GetMapping("/{id}")
     public ResponseEntity<ProvinceDto> getById(@PathVariable Integer id) throws SQLException {
         ProvinceDto province = provinceService.getProvinceById(id);
+        return ResponseEntity.ok(province);
+    }
+
+    // @GetMapping("/name/")
+    // public ResponseEntity<ProvinceDto> getByName(@RequestParam("name") String
+    // name) throws SQLException {
+    // ProvinceDto province = provinceService.getProvinceByName(name);
+    // return ResponseEntity.ok(province);
+    // }
+
+    @GetMapping("/name/{name}")
+    public ResponseEntity<ProvinceDto> getByName(@PathVariable String name) throws SQLException {
+        ProvinceDto province = provinceService.getProvinceByName(name);
         return ResponseEntity.ok(province);
     }
 

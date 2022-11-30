@@ -81,7 +81,7 @@ public class HotelModalityServiceImpl implements IHotelModalityService {
             ResultSet resultSet = pstmt.executeQuery();
 
             while (resultSet.next()) {
-                int idHotelModality = resultSet.getInt(2);
+                int idHotelModality = resultSet.getInt(1);
 
                 hotelModality = new HotelModalityDto(idHotelModality, hotelModalityName);
             }

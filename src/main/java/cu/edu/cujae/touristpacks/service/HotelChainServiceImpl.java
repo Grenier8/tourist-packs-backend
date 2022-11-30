@@ -71,6 +71,28 @@ public class HotelChainServiceImpl implements IHotelChainService {
     }
 
     @Override
+    public HotelChainDto getHotelChainByName(String hotelChainName) throws SQLException {
+        HotelChainDto hotelChain = null;
+
+        try (Connection connection = jdbcTemplate.getDataSource().getConnection()) {
+            PreparedStatement pstmt = connection.prepareStatement(
+                    "SELECT * FROM hotel_chain where chain_name = ?");
+
+            pstmt.setString(1, hotelChainName);
+
+            ResultSet resultSet = pstmt.executeQuery();
+
+            while (resultSet.next()) {
+                int hotelChainId = resultSet.getInt(1);
+
+                hotelChain = new HotelChainDto(hotelChainId, hotelChainName);
+            }
+        }
+
+        return hotelChain;
+    }
+
+    @Override
     public void createHotelChain(HotelChainDto hotelChain) throws SQLException {
         String function = "{call hotel_chain_insert(?)}";
 
@@ -107,25 +129,4 @@ public class HotelChainServiceImpl implements IHotelChainService {
 
     }
 
-    @Override
-    public HotelChainDto getHotelChainByName(String hotelChainName) throws SQLException {
-        HotelChainDto hotelChain = null;
-
-        try (Connection connection = jdbcTemplate.getDataSource().getConnection()) {
-            PreparedStatement pstmt = connection.prepareStatement(
-                    "SELECT * FROM hotel_chain where chain_name = ?");
-
-            pstmt.setString(1, hotelChainName);
-
-            ResultSet resultSet = pstmt.executeQuery();
-
-            while (resultSet.next()) {
-                int hotelChainId = resultSet.getInt(2);
-
-                hotelChain = new HotelChainDto(hotelChainId, hotelChainName);
-            }
-        }
-
-        return hotelChain;
-    }
 }

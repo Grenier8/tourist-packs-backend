@@ -9,12 +9,18 @@ import java.sql.Types;
 import java.util.ArrayList;
 import java.util.List;
 
+import cu.edu.cujae.touristpacks.core.dto.DiaryActivityDto;
+import cu.edu.cujae.touristpacks.core.dto.DiaryActivityTouristPackDto;
 import cu.edu.cujae.touristpacks.core.dto.HotelDto;
 import cu.edu.cujae.touristpacks.core.dto.RoomPlanSeasonDto;
 import cu.edu.cujae.touristpacks.core.dto.TouristPackDto;
+import cu.edu.cujae.touristpacks.core.dto.TransportServiceDto;
+import cu.edu.cujae.touristpacks.core.dto.TransportServiceTouristPackDto;
+import cu.edu.cujae.touristpacks.core.service.IDiaryActivityTouristPackService;
 import cu.edu.cujae.touristpacks.core.service.IHotelService;
 import cu.edu.cujae.touristpacks.core.service.IRoomPlanSeasonService;
 import cu.edu.cujae.touristpacks.core.service.ITouristPackService;
+import cu.edu.cujae.touristpacks.core.service.ITransportServiceTouristPackService;
 
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.jdbc.core.JdbcTemplate;
@@ -32,6 +38,12 @@ public class TouristPackServiceImpl implements ITouristPackService {
     @Autowired
     IRoomPlanSeasonService roomPlanSeasonService;
 
+    @Autowired
+    private ITransportServiceTouristPackService transportServiceTouristPackService;
+
+    @Autowired
+    private IDiaryActivityTouristPackService diaryActivityTouristPackService;
+
     @Override
     public List<TouristPackDto> getTouristPacks() throws SQLException {
         List<TouristPackDto> list = new ArrayList<>();
@@ -47,7 +59,7 @@ public class TouristPackServiceImpl implements ITouristPackService {
             ResultSet resultSet = (ResultSet) statement.getObject(1);
 
             while (resultSet.next()) {
-                int idPack = resultSet.getInt(1);
+                int idTouristPack = resultSet.getInt(1);
                 String promotionalName = resultSet.getString(2);
                 int daysAmount = resultSet.getInt(3);
                 int nightsAmount = resultSet.getInt(4);
@@ -60,9 +72,13 @@ public class TouristPackServiceImpl implements ITouristPackService {
 
                 HotelDto hotel = hotelService.getHotelById(idHotel);
                 RoomPlanSeasonDto roomPlanSeason = roomPlanSeasonService.getRoomPlanSeasonById(idRoomPlanSeason);
+                List<TransportServiceDto> transportServices = transportServiceTouristPackService
+                        .getTransportServicesByIdTouristPack(idTouristPack);
+                List<DiaryActivityDto> diaryActivities = diaryActivityTouristPackService
+                        .getDiaryActivitiesByIdTouristPack(idTouristPack);
 
-                TouristPackDto touristPack = new TouristPackDto(idPack, promotionalName, nightsAmount, paxAmount,
-                        hotelAirportPrice, hotel, roomPlanSeason);
+                TouristPackDto touristPack = new TouristPackDto(idTouristPack, promotionalName, nightsAmount, paxAmount,
+                        hotelAirportPrice, hotel, roomPlanSeason, transportServices, diaryActivities);
                 list.add(touristPack);
             }
         }
@@ -92,12 +108,16 @@ public class TouristPackServiceImpl implements ITouristPackService {
                 double hotelAirportPrice = resultSet.getDouble(8);
                 int idHotel = resultSet.getInt(9);
                 int idRoomPlanSeason = resultSet.getInt(10);
+                List<TransportServiceDto> transportServices = transportServiceTouristPackService
+                        .getTransportServicesByIdTouristPack(idTouristPack);
+                List<DiaryActivityDto> diaryActivities = diaryActivityTouristPackService
+                        .getDiaryActivitiesByIdTouristPack(idTouristPack);
 
                 HotelDto hotel = hotelService.getHotelById(idHotel);
                 RoomPlanSeasonDto roomPlanSeason = roomPlanSeasonService.getRoomPlanSeasonById(idRoomPlanSeason);
 
                 touristPack = new TouristPackDto(idTouristPack, promotionalName, nightsAmount, paxAmount,
-                        hotelAirportPrice, hotel, roomPlanSeason);
+                        hotelAirportPrice, hotel, roomPlanSeason, transportServices, diaryActivities);
             }
         }
 
@@ -126,12 +146,16 @@ public class TouristPackServiceImpl implements ITouristPackService {
                 double hotelAirportPrice = resultSet.getDouble(8);
                 int idHotel = resultSet.getInt(9);
                 int idRoomPlanSeason = resultSet.getInt(10);
+                List<TransportServiceDto> transportServices = transportServiceTouristPackService
+                        .getTransportServicesByIdTouristPack(idTouristPack);
+                List<DiaryActivityDto> diaryActivities = diaryActivityTouristPackService
+                        .getDiaryActivitiesByIdTouristPack(idTouristPack);
 
                 HotelDto hotel = hotelService.getHotelById(idHotel);
                 RoomPlanSeasonDto roomPlanSeason = roomPlanSeasonService.getRoomPlanSeasonById(idRoomPlanSeason);
 
                 touristPack = new TouristPackDto(idTouristPack, promotionalName, nightsAmount, paxAmount,
-                        hotelAirportPrice, hotel, roomPlanSeason);
+                        hotelAirportPrice, hotel, roomPlanSeason, transportServices, diaryActivities);
             }
         }
 
@@ -156,6 +180,14 @@ public class TouristPackServiceImpl implements ITouristPackService {
             statement.execute();
         }
 
+        TouristPackDto insertedTouristPack = getTouristPackByName(touristPack.getPromotionalName());
+
+        for (TransportServiceDto transportService : touristPack.getTransportServices()) {
+            TransportServiceTouristPackDto transportServiceTouristPack = new TransportServiceTouristPackDto(
+                    transportService, insertedTouristPack);
+            transportServiceTouristPackService.createTransportServiceTouristPack(transportServiceTouristPack);
+        }
+
     }
 
     @Override
@@ -177,10 +209,64 @@ public class TouristPackServiceImpl implements ITouristPackService {
             statement.execute();
         }
 
+        List<TransportServiceDto> formerTransportServices = transportServiceTouristPackService
+                .getTransportServicesByIdTouristPack(touristPack.getIdTouristPack());
+        List<TransportServiceDto> newTransportServices = touristPack.getTransportServices();
+
+        for (TransportServiceDto formerTransportService : formerTransportServices) {
+            boolean deleted = true;
+            for (TransportServiceDto newTransportService : newTransportServices) {
+                if (formerTransportService.getIdTransportService() == newTransportService
+                        .getIdTransportService()) {
+                    deleted = false;
+                    newTransportServices.remove(newTransportService);
+                    break;
+                }
+            }
+            if (deleted) {
+                transportServiceTouristPackService.deleteTransportServiceTouristPackByIds(
+                        touristPack.getIdTouristPack(),
+                        formerTransportService.getIdTransportService());
+            }
+        }
+
+        for (TransportServiceDto newTransportService : newTransportServices) {
+            transportServiceTouristPackService.createTransportServiceTouristPack(
+                    new TransportServiceTouristPackDto(newTransportService, touristPack));
+        }
+
+        List<DiaryActivityDto> formerDiaryActivities = diaryActivityTouristPackService
+                .getDiaryActivitiesByIdTouristPack(touristPack.getIdTouristPack());
+        List<DiaryActivityDto> newDiaryActivities = touristPack.getDiaryActivities();
+
+        for (DiaryActivityDto formerDiaryActivity : formerDiaryActivities) {
+            boolean deleted = true;
+            for (DiaryActivityDto newDiaryActivity : newDiaryActivities) {
+                if (formerDiaryActivity.getIdDiaryActivity() == newDiaryActivity
+                        .getIdDiaryActivity()) {
+                    deleted = false;
+                    newDiaryActivities.remove(newDiaryActivity);
+                    break;
+                }
+            }
+            if (deleted) {
+                diaryActivityTouristPackService.deleteDiaryActivityTouristPackByIds(touristPack.getIdTouristPack(),
+                        formerDiaryActivity.getIdDiaryActivity());
+            }
+        }
+
+        for (DiaryActivityDto newDiaryActivity : newDiaryActivities) {
+            diaryActivityTouristPackService
+                    .createDiaryActivityTouristPack(new DiaryActivityTouristPackDto(newDiaryActivity, touristPack));
+        }
+
     }
 
     @Override
     public void deleteTouristPack(int idTouristPack) throws SQLException {
+        transportServiceTouristPackService.deleteTransportServiceTouristPackByIdTouristPack(idTouristPack);
+        diaryActivityTouristPackService.deleteDiaryActivityTouristPackByIdTouristPack(idTouristPack);
+
         String function = "{call turist_pack_delete(?)}";
 
         try (Connection connection = jdbcTemplate.getDataSource().getConnection()) {

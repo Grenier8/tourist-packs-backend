@@ -1,5 +1,7 @@
 package cu.edu.cujae.touristpacks.core.dto;
 
+import java.util.List;
+
 public class TouristPackDto {
 
 	private int idTouristPack;
@@ -12,13 +14,16 @@ public class TouristPackDto {
 	private double hotelAirportPrice;
 	private HotelDto hotel;
 	private RoomPlanSeasonDto roomPlanSeason;
+	private List<TransportServiceDto> transportServices;
+	private List<DiaryActivityDto> diaryActivities;
 
 	public TouristPackDto() {
 
 	}
 
 	public TouristPackDto(String promotionalName, int daysAmount, int nightsAmount, int paxAmount,
-			double hotelAirportPrice, HotelDto hotel, RoomPlanSeasonDto roomPlanSeason) {
+			double hotelAirportPrice, HotelDto hotel, RoomPlanSeasonDto roomPlanSeason,
+			List<TransportServiceDto> transportServices, List<DiaryActivityDto> diaryActivities) {
 		this.promotionalName = promotionalName;
 		this.daysAmount = daysAmount;
 		this.nightsAmount = nightsAmount;
@@ -26,34 +31,25 @@ public class TouristPackDto {
 		this.hotelAirportPrice = hotelAirportPrice;
 		this.hotel = hotel;
 		this.roomPlanSeason = roomPlanSeason;
-
-		// inicialateAtributes();
+		this.transportServices = transportServices;
+		this.diaryActivities = diaryActivities;
 	}
 
 	public TouristPackDto(int idTouristPack, String promotionalName, int daysAmount, int nightsAmount, int paxAmount,
-			double hotelAirportPrice, HotelDto hotel, RoomPlanSeasonDto roomPlanSeason) {
+			double hotelAirportPrice, HotelDto hotel, RoomPlanSeasonDto roomPlanSeason,
+			List<TransportServiceDto> transportServices, List<DiaryActivityDto> diaryActivities) {
+		this(promotionalName, daysAmount, nightsAmount, paxAmount, hotelAirportPrice, hotel, roomPlanSeason,
+				transportServices, diaryActivities);
 		this.idTouristPack = idTouristPack;
-		this.promotionalName = promotionalName;
-		this.daysAmount = daysAmount;
-		this.nightsAmount = nightsAmount;
-		this.paxAmount = paxAmount;
-		this.hotelAirportPrice = hotelAirportPrice;
-		this.hotel = hotel;
-		this.roomPlanSeason = roomPlanSeason;
 
-		// inicialateAtributes();
 	}
 
 	public TouristPackDto(int idTouristPack, String promotionalName, int nightsAmount, int paxAmount,
-			double hotelAirportPrice, HotelDto hotel, RoomPlanSeasonDto roomPlanSeason) {
-		this.idTouristPack = idTouristPack;
-		this.promotionalName = promotionalName;
-		this.daysAmount = nightsAmount + 1;
-		this.nightsAmount = nightsAmount;
-		this.paxAmount = paxAmount;
-		this.hotelAirportPrice = hotelAirportPrice;
-		this.hotel = hotel;
-		this.roomPlanSeason = roomPlanSeason;
+			double hotelAirportPrice, HotelDto hotel, RoomPlanSeasonDto roomPlanSeason,
+			List<TransportServiceDto> transportServices, List<DiaryActivityDto> diaryActivities) {
+		this(idTouristPack, promotionalName, nightsAmount + 1, nightsAmount, paxAmount, hotelAirportPrice, hotel,
+				roomPlanSeason,
+				transportServices, diaryActivities);
 
 	}
 
@@ -158,6 +154,22 @@ public class TouristPackDto {
 
 	public void setRoomPlanSeason(RoomPlanSeasonDto roomPlanSeason) {
 		this.roomPlanSeason = roomPlanSeason;
+	}
+
+	public List<TransportServiceDto> getTransportServices() {
+		return this.transportServices;
+	}
+
+	public void setTransportServices(List<TransportServiceDto> transportServices) {
+		this.transportServices = transportServices;
+	}
+
+	public List<DiaryActivityDto> getDiaryActivities() {
+		return this.diaryActivities;
+	}
+
+	public void setDiaryActivities(List<DiaryActivityDto> diaryActivities) {
+		this.diaryActivities = diaryActivities;
 	}
 
 }

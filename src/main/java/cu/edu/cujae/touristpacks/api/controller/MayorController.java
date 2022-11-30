@@ -18,7 +18,7 @@ import cu.edu.cujae.touristpacks.core.dto.MayorDto;
 import cu.edu.cujae.touristpacks.core.service.IMayorService;
 
 @RestController
-@RequestMapping("/api/v1/minors")
+@RequestMapping("/api/v1/dtb_tables")
 public class MayorController {
 
     @Autowired
