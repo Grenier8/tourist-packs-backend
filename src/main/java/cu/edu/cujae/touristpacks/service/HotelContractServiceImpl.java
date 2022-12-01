@@ -13,9 +13,12 @@ import java.util.List;
 import cu.edu.cujae.touristpacks.core.dto.ContractDto;
 import cu.edu.cujae.touristpacks.core.dto.HotelContractDto;
 import cu.edu.cujae.touristpacks.core.dto.HotelDto;
+import cu.edu.cujae.touristpacks.core.dto.RoomPlanSeasonDto;
+import cu.edu.cujae.touristpacks.core.dto.RoomPlanSeasonHotelContractDto;
 import cu.edu.cujae.touristpacks.core.service.IContractService;
 import cu.edu.cujae.touristpacks.core.service.IHotelContractService;
 import cu.edu.cujae.touristpacks.core.service.IHotelService;
+import cu.edu.cujae.touristpacks.core.service.IRoomPlanSeasonHotelContractService;
 
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.jdbc.core.JdbcTemplate;
@@ -32,6 +35,9 @@ public class HotelContractServiceImpl implements IHotelContractService {
 
     @Autowired
     private IContractService contractService;
+
+    @Autowired
+    private IRoomPlanSeasonHotelContractService roomPlanSeasonHotelContractService;
 
     @Override
     public List<HotelContractDto> getHotelContracts() throws SQLException {
@@ -62,10 +68,12 @@ public class HotelContractServiceImpl implements IHotelContractService {
                 LocalDate endDate = contract.getEndDate();
                 LocalDate conciliationDate = contract.getConciliationDate();
                 int year = conciliationDate.getYear();
+                List<RoomPlanSeasonDto> roomPlanSeasons = roomPlanSeasonHotelContractService
+                        .getRoomPlanSeasonsByIdHotelContract(idHotelContract);
 
                 HotelContractDto hotelContract = new HotelContractDto(idHotelContract, idContract, contractTitle,
                         startDate,
-                        endDate, conciliationDate, contractDescription, hotel);
+                        endDate, conciliationDate, contractDescription, hotel, roomPlanSeasons);
 
                 list.add(hotelContract);
             }
@@ -100,9 +108,11 @@ public class HotelContractServiceImpl implements IHotelContractService {
                 LocalDate endDate = contract.getEndDate();
                 LocalDate conciliationDate = contract.getConciliationDate();
                 int year = conciliationDate.getYear();
+                List<RoomPlanSeasonDto> roomPlanSeasons = roomPlanSeasonHotelContractService
+                        .getRoomPlanSeasonsByIdHotelContract(idHotelContract);
 
                 hotelContract = new HotelContractDto(idHotelContract, idContract, contractTitle, startDate, endDate,
-                        conciliationDate, contractDescription, hotel);
+                        conciliationDate, contractDescription, hotel, roomPlanSeasons);
             }
         }
 
@@ -134,11 +144,13 @@ public class HotelContractServiceImpl implements IHotelContractService {
                 LocalDate endDate = contract.getEndDate();
                 LocalDate conciliationDate = contract.getConciliationDate();
                 int year = conciliationDate.getYear();
+                List<RoomPlanSeasonDto> roomPlanSeasons = roomPlanSeasonHotelContractService
+                        .getRoomPlanSeasonsByIdHotelContract(idHotelContract);
 
                 HotelDto hotel = hotelService.getHotelById(idHotel);
 
                 hotelContract = new HotelContractDto(idHotelContract, idContract, contractTitle, startDate, endDate,
-                        conciliationDate, contractDescription, hotel);
+                        conciliationDate, contractDescription, hotel, roomPlanSeasons);
             }
         }
 
@@ -161,6 +173,14 @@ public class HotelContractServiceImpl implements IHotelContractService {
             statement.execute();
         }
 
+        HotelContractDto insertedHotelContract = getHotelContractByTitle(hotelContract.getContractTitle());
+
+        for (RoomPlanSeasonDto roomPlanSeason : hotelContract.getRoomPlanSeasons()) {
+            RoomPlanSeasonHotelContractDto roomPlanSeasonHotelContract = new RoomPlanSeasonHotelContractDto(
+                    roomPlanSeason, insertedHotelContract);
+            roomPlanSeasonHotelContractService.createRoomPlanSeasonHotelContract(roomPlanSeasonHotelContract);
+        }
+
     }
 
     @Override
@@ -180,10 +200,39 @@ public class HotelContractServiceImpl implements IHotelContractService {
             statement.execute();
         }
 
+        List<RoomPlanSeasonDto> formerRoomPlanSeasons = roomPlanSeasonHotelContractService
+                .getRoomPlanSeasonsByIdHotelContract(hotelContract.getIdHotelContract());
+        List<RoomPlanSeasonDto> newRoomPlanSeasons = hotelContract.getRoomPlanSeasons();
+
+        for (RoomPlanSeasonDto formerRoomPlanSeason : formerRoomPlanSeasons) {
+            boolean deleted = true;
+            for (RoomPlanSeasonDto newRoomPlanSeason : newRoomPlanSeasons) {
+                if (formerRoomPlanSeason.getIdRoomPlanSeason() == newRoomPlanSeason
+                        .getIdRoomPlanSeason()) {
+                    deleted = false;
+                    newRoomPlanSeasons.remove(newRoomPlanSeason);
+                    break;
+                }
+            }
+            if (deleted) {
+                roomPlanSeasonHotelContractService.deleteRoomPlanSeasonHotelContractByIds(
+                        hotelContract.getIdHotelContract(),
+                        formerRoomPlanSeason.getIdRoomPlanSeason());
+            }
+        }
+
+        for (RoomPlanSeasonDto newRoomPlanSeason : newRoomPlanSeasons) {
+            roomPlanSeasonHotelContractService
+                    .createRoomPlanSeasonHotelContract(
+                            new RoomPlanSeasonHotelContractDto(newRoomPlanSeason, hotelContract));
+        }
+
     }
 
     @Override
     public void deleteHotelContract(int idHotelContract) throws SQLException {
+        roomPlanSeasonHotelContractService.deleteRoomPlanSeasonHotelContractByIdHotelContract(idHotelContract);
+
         int idContract = getHotelContractById(idHotelContract).getIdContract();
 
         String function = "{call hotel_contract_delete(?)}";

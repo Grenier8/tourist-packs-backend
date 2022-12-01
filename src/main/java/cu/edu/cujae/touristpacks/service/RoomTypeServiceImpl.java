@@ -82,7 +82,7 @@ public class RoomTypeServiceImpl implements IRoomTypeService {
             ResultSet resultSet = pstmt.executeQuery();
 
             while (resultSet.next()) {
-                int idRoomType = resultSet.getInt(2);
+                int idRoomType = resultSet.getInt(1);
 
                 roomType = new RoomTypeDto(idRoomType, roomTypeName);
             }

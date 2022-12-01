@@ -30,6 +30,12 @@ public class DiaryActivityController {
         return ResponseEntity.ok(list);
     }
 
+    @GetMapping("/name/{name}")
+    public ResponseEntity<DiaryActivityDto> getByName(@PathVariable String name) throws SQLException {
+        DiaryActivityDto diaryActivity = diaryActivityService.getDiaryActivityByName(name);
+        return ResponseEntity.ok(diaryActivity);
+    }
+
     @GetMapping("/{id}")
     public ResponseEntity<DiaryActivityDto> getById(@PathVariable Integer id) throws SQLException {
         DiaryActivityDto diaryActivity = diaryActivityService.getDiaryActivityById(id);

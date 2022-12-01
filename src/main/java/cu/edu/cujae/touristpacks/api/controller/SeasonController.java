@@ -36,6 +36,12 @@ public class SeasonController {
         return ResponseEntity.ok(season);
     }
 
+    @GetMapping("/name/{name}")
+    public ResponseEntity<SeasonDto> getByName(@PathVariable String name) throws SQLException {
+        SeasonDto season = seasonService.getSeasonByName(name);
+        return ResponseEntity.ok(season);
+    }
+
     @PostMapping("/")
     public ResponseEntity<String> create(@RequestBody SeasonDto season) throws SQLException {
         seasonService.createSeason(season);

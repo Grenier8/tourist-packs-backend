@@ -36,6 +36,12 @@ public class HotelContractController {
         return ResponseEntity.ok(hotelContract);
     }
 
+    @GetMapping("/title/{title}")
+    public ResponseEntity<HotelContractDto> getByTitle(@PathVariable String title) throws SQLException {
+        HotelContractDto hotelContract = hotelContractService.getHotelContractByTitle(title);
+        return ResponseEntity.ok(hotelContract);
+    }
+
     @PostMapping("/")
     public ResponseEntity<String> create(@RequestBody HotelContractDto hotelContract) throws SQLException {
         hotelContractService.createHotelContract(hotelContract);

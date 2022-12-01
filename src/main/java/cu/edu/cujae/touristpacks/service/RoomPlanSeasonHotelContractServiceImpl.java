@@ -132,4 +132,55 @@ public class RoomPlanSeasonHotelContractServiceImpl implements IRoomPlanSeasonHo
 
     }
 
+    @Override
+    public List<RoomPlanSeasonDto> getRoomPlanSeasonsByIdHotelContract(int idHotelContract) throws SQLException {
+        List<RoomPlanSeasonDto> list = new ArrayList<>();
+
+        try (Connection connection = jdbcTemplate.getDataSource().getConnection()) {
+            PreparedStatement pstmt = connection.prepareStatement(
+                    "SELECT * FROM room_plan_season_hotel_contract where id_hotel_contract = ?");
+
+            pstmt.setInt(1, idHotelContract);
+
+            ResultSet resultSet = pstmt.executeQuery();
+
+            while (resultSet.next()) {
+                int idRoomPlanSeason = resultSet.getInt(3);
+
+                list.add(roomPlanSeasonService.getRoomPlanSeasonById(idRoomPlanSeason));
+
+            }
+        }
+        return list;
+    }
+
+    @Override
+    public void deleteRoomPlanSeasonHotelContractByIds(int idHotelContract, int idRoomPlanSeason) throws SQLException {
+        try (Connection connection = jdbcTemplate.getDataSource().getConnection()) {
+            PreparedStatement pstmt = connection.prepareStatement(
+                    "DELETE FROM room_plan_season_hotel_contract where id_hotel_contract = ? AND id_room_plan_season = ?");
+
+            pstmt.setInt(1, idHotelContract);
+            pstmt.setInt(2, idRoomPlanSeason);
+
+            pstmt.executeUpdate();
+
+        }
+
+    }
+
+    @Override
+    public void deleteRoomPlanSeasonHotelContractByIdHotelContract(int idHotelContract) throws SQLException {
+        try (Connection connection = jdbcTemplate.getDataSource().getConnection()) {
+            PreparedStatement pstmt = connection.prepareStatement(
+                    "DELETE FROM room_plan_season_hotel_contract where id_hotel_contract = ?");
+
+            pstmt.setInt(1, idHotelContract);
+
+            pstmt.executeUpdate();
+
+        }
+
+    }
+
 }

@@ -140,4 +140,57 @@ public class OtherServiceContractDiaryActivityServiceImpl implements IOtherServi
 
     }
 
+    @Override
+    public List<DiaryActivityDto> getDiaryActivitiesByIdOtherServiceContract(int idOtherServiceContract)
+            throws SQLException {
+        List<DiaryActivityDto> list = new ArrayList<>();
+
+        try (Connection connection = jdbcTemplate.getDataSource().getConnection()) {
+            PreparedStatement pstmt = connection.prepareStatement(
+                    "SELECT * FROM other_service_contract_diary_activity where id_other_service_contract = ?");
+
+            pstmt.setInt(1, idOtherServiceContract);
+
+            ResultSet resultSet = pstmt.executeQuery();
+
+            while (resultSet.next()) {
+                int idDiaryActivity = resultSet.getInt(3);
+
+                list.add(diaryActivityService.getDiaryActivityById(idDiaryActivity));
+
+            }
+        }
+        return list;
+    }
+
+    @Override
+    public void deleteOtherServiceContractDiaryActivityByIdOtherServiceContract(int idOtherServiceContract)
+            throws SQLException {
+        try (Connection connection = jdbcTemplate.getDataSource().getConnection()) {
+            PreparedStatement pstmt = connection.prepareStatement(
+                    "DELETE FROM other_service_contract_diary_activity where id_other_service_contract = ?");
+
+            pstmt.setInt(1, idOtherServiceContract);
+
+            pstmt.executeUpdate();
+
+        }
+
+    }
+
+    @Override
+    public void deleteHotelDiaryActivityByIds(int idOtherServiceContract, int idDiaryActivity) throws SQLException {
+        try (Connection connection = jdbcTemplate.getDataSource().getConnection()) {
+            PreparedStatement pstmt = connection.prepareStatement(
+                    "DELETE FROM other_service_contract_diary_activity where id_other_service_contract = ? AND id_activity = ?");
+
+            pstmt.setInt(1, idOtherServiceContract);
+            pstmt.setInt(2, idDiaryActivity);
+
+            pstmt.executeUpdate();
+
+        }
+
+    }
+
 }

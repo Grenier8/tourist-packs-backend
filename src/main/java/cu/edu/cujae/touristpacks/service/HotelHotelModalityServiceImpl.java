@@ -126,4 +126,55 @@ public class HotelHotelModalityServiceImpl implements IHotelHotelModalityService
         }
     }
 
+    @Override
+    public void deleteHotelHotelModalityByIdHotel(int idHotel) throws SQLException {
+
+        try (Connection connection = jdbcTemplate.getDataSource().getConnection()) {
+            PreparedStatement pstmt = connection.prepareStatement(
+                    "DELETE FROM hotel_hotel_modality where id_hotel = ?");
+
+            pstmt.setInt(1, idHotel);
+
+            pstmt.executeUpdate();
+
+        }
+    }
+
+    @Override
+    public List<HotelModalityDto> getHotelModalitiesByIdHotel(int idHotel) throws SQLException {
+        List<HotelModalityDto> list = new ArrayList<>();
+
+        try (Connection connection = jdbcTemplate.getDataSource().getConnection()) {
+            PreparedStatement pstmt = connection.prepareStatement(
+                    "SELECT * FROM hotel_hotel_modality where id_hotel = ?");
+
+            pstmt.setInt(1, idHotel);
+
+            ResultSet resultSet = pstmt.executeQuery();
+
+            while (resultSet.next()) {
+                int idHotelModality = resultSet.getInt(3);
+
+                list.add(hotelModalityService.getHotelModalityById(idHotelModality));
+
+            }
+        }
+        return list;
+    }
+
+    @Override
+    public void deleteHotelHotelModalityByIds(int idHotel, int idHotelModality) throws SQLException {
+        try (Connection connection = jdbcTemplate.getDataSource().getConnection()) {
+            PreparedStatement pstmt = connection.prepareStatement(
+                    "DELETE FROM hotel_hotel_modality where id_hotel = ? AND id_hotel_modality = ?");
+
+            pstmt.setInt(1, idHotel);
+            pstmt.setInt(2, idHotelModality);
+
+            pstmt.executeUpdate();
+
+        }
+
+    }
+
 }

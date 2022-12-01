@@ -18,7 +18,7 @@ import cu.edu.cujae.touristpacks.core.dto.ServiceTypeDto;
 import cu.edu.cujae.touristpacks.core.service.IServiceTypeService;
 
 @RestController
-@RequestMapping("/api/v1/serviceTypes")
+@RequestMapping("/api/v1/service_types")
 public class ServiceTypeController {
 
     @Autowired
@@ -33,6 +33,12 @@ public class ServiceTypeController {
     @GetMapping("/{id}")
     public ResponseEntity<ServiceTypeDto> getById(@PathVariable Integer id) throws SQLException {
         ServiceTypeDto serviceType = serviceTypeService.getServiceTypeById(id);
+        return ResponseEntity.ok(serviceType);
+    }
+
+    @GetMapping("/name/{name}")
+    public ResponseEntity<ServiceTypeDto> getByName(@PathVariable String name) throws SQLException {
+        ServiceTypeDto serviceType = serviceTypeService.getServiceTypeByName(name);
         return ResponseEntity.ok(serviceType);
     }
 

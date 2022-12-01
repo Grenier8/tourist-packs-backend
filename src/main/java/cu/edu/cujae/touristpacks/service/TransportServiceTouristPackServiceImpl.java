@@ -133,4 +133,55 @@ public class TransportServiceTouristPackServiceImpl implements ITransportService
 
     }
 
+    @Override
+    public List<TransportServiceDto> getTransportServicesByIdTouristPack(int idTouristPack) throws SQLException {
+        List<TransportServiceDto> list = new ArrayList<>();
+
+        try (Connection connection = jdbcTemplate.getDataSource().getConnection()) {
+            PreparedStatement pstmt = connection.prepareStatement(
+                    "SELECT * FROM transport_service_turist_pack where id_pack = ?");
+
+            pstmt.setInt(1, idTouristPack);
+
+            ResultSet resultSet = pstmt.executeQuery();
+
+            while (resultSet.next()) {
+                int idTransportService = resultSet.getInt(3);
+
+                list.add(transportServiceService.getTransportServiceById(idTransportService));
+
+            }
+        }
+        return list;
+    }
+
+    @Override
+    public void deleteTransportServiceTouristPackByIdTouristPack(int idTouristPack) throws SQLException {
+        try (Connection connection = jdbcTemplate.getDataSource().getConnection()) {
+            PreparedStatement pstmt = connection.prepareStatement(
+                    "DELETE FROM transport_service_turist_pack where id_pack = ?");
+
+            pstmt.setInt(1, idTouristPack);
+
+            pstmt.executeUpdate();
+
+        }
+
+    }
+
+    @Override
+    public void deleteTransportServiceTouristPackByIds(int idTouristPack, int idTransportService) throws SQLException {
+        try (Connection connection = jdbcTemplate.getDataSource().getConnection()) {
+            PreparedStatement pstmt = connection.prepareStatement(
+                    "DELETE FROM transport_service_turist_pack where id_pack = ? AND id_transport_service = ?");
+
+            pstmt.setInt(1, idTouristPack);
+            pstmt.setInt(2, idTransportService);
+
+            pstmt.executeUpdate();
+
+        }
+
+    }
+
 }

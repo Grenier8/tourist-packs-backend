@@ -18,7 +18,7 @@ import cu.edu.cujae.touristpacks.core.dto.MayorDto;
 import cu.edu.cujae.touristpacks.core.service.IMayorService;
 
 @RestController
-@RequestMapping("/api/v1/minors")
+@RequestMapping("/api/v1/dtb_tables")
 public class MayorController {
 
     @Autowired
@@ -33,6 +33,12 @@ public class MayorController {
     @GetMapping("/{id}")
     public ResponseEntity<MayorDto> getById(@PathVariable Integer id) throws SQLException {
         MayorDto minor = minorService.getMayorById(id);
+        return ResponseEntity.ok(minor);
+    }
+
+    @GetMapping("/name/{name}")
+    public ResponseEntity<MayorDto> getByName(@PathVariable String name) throws SQLException {
+        MayorDto minor = minorService.getMayorByName(name);
         return ResponseEntity.ok(minor);
     }
 

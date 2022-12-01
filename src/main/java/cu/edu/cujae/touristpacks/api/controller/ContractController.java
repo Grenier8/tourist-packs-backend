@@ -36,6 +36,12 @@ public class ContractController {
         return ResponseEntity.ok(contract);
     }
 
+    @GetMapping("/title/{title}")
+    public ResponseEntity<ContractDto> getByTitle(@PathVariable String title) throws SQLException {
+        ContractDto contract = contractService.getContractByTitle(title);
+        return ResponseEntity.ok(contract);
+    }
+
     @PostMapping("/")
     public ResponseEntity<String> create(@RequestBody ContractDto contract) throws SQLException {
         contractService.createContract(contract);
