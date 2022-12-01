@@ -36,6 +36,12 @@ public class MayorController {
         return ResponseEntity.ok(minor);
     }
 
+    @GetMapping("/name/{name}")
+    public ResponseEntity<MayorDto> getByName(@PathVariable String name) throws SQLException {
+        MayorDto minor = minorService.getMayorByName(name);
+        return ResponseEntity.ok(minor);
+    }
+
     @PostMapping("/")
     public ResponseEntity<String> create(@RequestBody MayorDto minor) throws SQLException {
         minorService.createMayor(minor);

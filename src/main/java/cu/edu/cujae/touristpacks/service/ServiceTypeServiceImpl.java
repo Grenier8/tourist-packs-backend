@@ -82,7 +82,7 @@ public class ServiceTypeServiceImpl implements IServiceTypeService {
             ResultSet resultSet = pstmt.executeQuery();
 
             while (resultSet.next()) {
-                int idServiceType = resultSet.getInt(2);
+                int idServiceType = resultSet.getInt(1);
 
                 serviceType = new ServiceTypeDto(idServiceType, serviceTypeName);
             }

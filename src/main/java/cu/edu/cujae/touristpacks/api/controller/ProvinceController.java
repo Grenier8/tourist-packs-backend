@@ -37,13 +37,6 @@ public class ProvinceController {
         return ResponseEntity.ok(province);
     }
 
-    // @GetMapping("/name/")
-    // public ResponseEntity<ProvinceDto> getByName(@RequestParam("name") String
-    // name) throws SQLException {
-    // ProvinceDto province = provinceService.getProvinceByName(name);
-    // return ResponseEntity.ok(province);
-    // }
-
     @GetMapping("/name/{name}")
     public ResponseEntity<ProvinceDto> getByName(@PathVariable String name) throws SQLException {
         ProvinceDto province = provinceService.getProvinceByName(name);

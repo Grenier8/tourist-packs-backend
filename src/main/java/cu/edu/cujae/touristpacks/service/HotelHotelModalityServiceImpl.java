@@ -127,7 +127,7 @@ public class HotelHotelModalityServiceImpl implements IHotelHotelModalityService
     }
 
     @Override
-    public void deleteHotelHotelModalityByHotel(int idHotel) throws SQLException {
+    public void deleteHotelHotelModalityByIdHotel(int idHotel) throws SQLException {
 
         try (Connection connection = jdbcTemplate.getDataSource().getConnection()) {
             PreparedStatement pstmt = connection.prepareStatement(

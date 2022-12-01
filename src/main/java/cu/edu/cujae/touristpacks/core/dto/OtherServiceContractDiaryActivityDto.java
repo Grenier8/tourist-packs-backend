@@ -10,12 +10,17 @@ public class OtherServiceContractDiaryActivityDto {
 	public OtherServiceContractDiaryActivityDto() {
 	}
 
-	public OtherServiceContractDiaryActivityDto(int idOtherServiceContractDiaryActivity, double activityPrice,
-			OtherServiceContractDto otherServiceContract, DiaryActivityDto diaryActivity) {
-		this.idOtherServiceContractDiaryActivity = idOtherServiceContractDiaryActivity;
-		this.activityPrice = activityPrice;
+	public OtherServiceContractDiaryActivityDto(OtherServiceContractDto otherServiceContract,
+			DiaryActivityDto diaryActivity) {
 		this.otherServiceContract = otherServiceContract;
 		this.diaryActivity = diaryActivity;
+	}
+
+	public OtherServiceContractDiaryActivityDto(int idOtherServiceContractDiaryActivity, double activityPrice,
+			OtherServiceContractDto otherServiceContract, DiaryActivityDto diaryActivity) {
+		this(otherServiceContract, diaryActivity);
+		this.idOtherServiceContractDiaryActivity = idOtherServiceContractDiaryActivity;
+		this.activityPrice = activityPrice;
 	}
 
 	public int getIdOtherServiceContractDiaryActivity() {

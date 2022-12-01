@@ -24,5 +24,5 @@ public interface IRoomPlanSeasonHotelContractService {
 
         void deleteRoomPlanSeasonHotelContractByIds(int idHotelContract, int idRoomPlanSeason) throws SQLException;
 
-        void deleteRoomPlanSeasonHotelContractByHotelContract(int idHotelContract) throws SQLException;
+        void deleteRoomPlanSeasonHotelContractByIdHotelContract(int idHotelContract) throws SQLException;
 }

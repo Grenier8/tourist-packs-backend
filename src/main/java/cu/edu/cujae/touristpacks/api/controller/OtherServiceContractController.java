@@ -36,6 +36,13 @@ public class OtherServiceContractController {
         return ResponseEntity.ok(otherServiceContract);
     }
 
+    @GetMapping("/title/{title}")
+    public ResponseEntity<OtherServiceContractDto> getByTitle(@PathVariable String title) throws SQLException {
+        OtherServiceContractDto otherServiceContract = otherServiceContractService
+                .getOtherServiceContractByTitle(title);
+        return ResponseEntity.ok(otherServiceContract);
+    }
+
     @PostMapping("/")
     public ResponseEntity<String> create(@RequestBody OtherServiceContractDto otherServiceContract)
             throws SQLException {

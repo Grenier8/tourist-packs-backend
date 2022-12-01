@@ -11,10 +11,13 @@ import java.util.ArrayList;
 import java.util.List;
 
 import cu.edu.cujae.touristpacks.core.dto.ContractDto;
+import cu.edu.cujae.touristpacks.core.dto.DiaryActivityDto;
+import cu.edu.cujae.touristpacks.core.dto.OtherServiceContractDiaryActivityDto;
 import cu.edu.cujae.touristpacks.core.dto.OtherServiceContractDto;
 import cu.edu.cujae.touristpacks.core.dto.ProvinceDto;
 import cu.edu.cujae.touristpacks.core.dto.ServiceTypeDto;
 import cu.edu.cujae.touristpacks.core.service.IContractService;
+import cu.edu.cujae.touristpacks.core.service.IOtherServiceContractDiaryActivityService;
 import cu.edu.cujae.touristpacks.core.service.IOtherServiceContractService;
 import cu.edu.cujae.touristpacks.core.service.IProvinceService;
 import cu.edu.cujae.touristpacks.core.service.IServiceTypeService;
@@ -37,6 +40,9 @@ public class OtherServiceContractServiceImpl implements IOtherServiceContractSer
 
     @Autowired
     private IProvinceService provinceService;
+
+    @Autowired
+    private IOtherServiceContractDiaryActivityService otherServiceContractDiaryActivityService;
 
     @Override
     public List<OtherServiceContractDto> getOtherServiceContracts() throws SQLException {
@@ -70,11 +76,14 @@ public class OtherServiceContractServiceImpl implements IOtherServiceContractSer
 
                 ServiceTypeDto serviceType = serviceTypeService.getServiceTypeById(idServiceType);
                 ProvinceDto province = provinceService.getProvinceById(idProvince);
+                List<DiaryActivityDto> diaryActivities = otherServiceContractDiaryActivityService
+                        .getDiaryActivitiesByIdOtherServiceContract(idOtherServiceContract);
 
                 OtherServiceContractDto otherServiceContract = new OtherServiceContractDto(idOtherServiceContract,
                         idContract,
                         contractTitle,
-                        startDate, endDate, conciliationDate, contractDescription, costPerPax, serviceType, province);
+                        startDate, endDate, conciliationDate, contractDescription, costPerPax, serviceType, province,
+                        diaryActivities);
 
                 list.add(otherServiceContract);
             }
@@ -112,10 +121,13 @@ public class OtherServiceContractServiceImpl implements IOtherServiceContractSer
 
                 ServiceTypeDto serviceType = serviceTypeService.getServiceTypeById(idServiceType);
                 ProvinceDto province = provinceService.getProvinceById(idProvince);
+                List<DiaryActivityDto> diaryActivities = otherServiceContractDiaryActivityService
+                        .getDiaryActivitiesByIdOtherServiceContract(idOtherServiceContract);
 
                 otherServiceContract = new OtherServiceContractDto(idOtherServiceContract, idContract,
                         contractTitle,
-                        startDate, endDate, conciliationDate, contractDescription, costPerPax, serviceType, province);
+                        startDate, endDate, conciliationDate, contractDescription, costPerPax, serviceType, province,
+                        diaryActivities);
             }
         }
 
@@ -152,10 +164,13 @@ public class OtherServiceContractServiceImpl implements IOtherServiceContractSer
 
                 ServiceTypeDto serviceType = serviceTypeService.getServiceTypeById(idServiceType);
                 ProvinceDto province = provinceService.getProvinceById(idProvince);
+                List<DiaryActivityDto> diaryActivities = otherServiceContractDiaryActivityService
+                        .getDiaryActivitiesByIdOtherServiceContract(idOtherServiceContract);
 
                 otherServiceContract = new OtherServiceContractDto(idOtherServiceContract, idContract,
                         contractTitle,
-                        startDate, endDate, conciliationDate, contractDescription, costPerPax, serviceType, province);
+                        startDate, endDate, conciliationDate, contractDescription, costPerPax, serviceType, province,
+                        diaryActivities);
             }
         }
 
@@ -179,11 +194,21 @@ public class OtherServiceContractServiceImpl implements IOtherServiceContractSer
             statement.execute();
         }
 
+        OtherServiceContractDto insertedOtherServiceContract = getOtherServiceContractByTitle(
+                otherServiceContract.getContractTitle());
+
+        for (DiaryActivityDto diaryActivity : otherServiceContract.getDiaryActivities()) {
+            OtherServiceContractDiaryActivityDto otherServiceContractDiaryActivity = new OtherServiceContractDiaryActivityDto(
+                    insertedOtherServiceContract, diaryActivity);
+            otherServiceContractDiaryActivityService
+                    .createOtherServiceContractDiaryActivity(otherServiceContractDiaryActivity);
+        }
+
     }
 
     @Override
     public void updateOtherServiceContract(OtherServiceContractDto otherServiceContract) throws SQLException {
-        
+
         int idContract = getOtherServiceContractById(otherServiceContract.getIdOtherServiceContract()).getIdContract();
         otherServiceContract.setIdContract(idContract);
         contractService.updateContract(otherServiceContract);
@@ -200,10 +225,39 @@ public class OtherServiceContractServiceImpl implements IOtherServiceContractSer
             statement.setInt(6, otherServiceContract.getIdContract());
             statement.execute();
         }
+
+        List<DiaryActivityDto> formerDiaryActivities = otherServiceContractDiaryActivityService
+                .getDiaryActivitiesByIdOtherServiceContract(otherServiceContract.getIdOtherServiceContract());
+        List<DiaryActivityDto> newDiaryActivities = otherServiceContract.getDiaryActivities();
+
+        for (DiaryActivityDto formerDiaryActivity : formerDiaryActivities) {
+            boolean deleted = true;
+            for (DiaryActivityDto newDiaryActivity : newDiaryActivities) {
+                if (formerDiaryActivity.getIdDiaryActivity() == newDiaryActivity
+                        .getIdDiaryActivity()) {
+                    deleted = false;
+                    newDiaryActivities.remove(newDiaryActivity);
+                    break;
+                }
+            }
+            if (deleted) {
+                otherServiceContractDiaryActivityService.deleteHotelDiaryActivityByIds(
+                        otherServiceContract.getIdOtherServiceContract(),
+                        formerDiaryActivity.getIdDiaryActivity());
+            }
+        }
+
+        for (DiaryActivityDto newDiaryActivity : newDiaryActivities) {
+            otherServiceContractDiaryActivityService.createOtherServiceContractDiaryActivity(
+                    new OtherServiceContractDiaryActivityDto(otherServiceContract, newDiaryActivity));
+        }
     }
 
     @Override
     public void deleteOtherServiceContract(int idOtherServiceContract) throws SQLException {
+        otherServiceContractDiaryActivityService
+                .deleteOtherServiceContractDiaryActivityByIdOtherServiceContract(idOtherServiceContract);
+
         int idContract = getOtherServiceContractById(idOtherServiceContract).getIdContract();
 
         String function = "{call other_service_contract_delete(?)}";

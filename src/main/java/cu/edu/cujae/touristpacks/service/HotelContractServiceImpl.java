@@ -231,7 +231,7 @@ public class HotelContractServiceImpl implements IHotelContractService {
 
     @Override
     public void deleteHotelContract(int idHotelContract) throws SQLException {
-        roomPlanSeasonHotelContractService.deleteRoomPlanSeasonHotelContractByHotelContract(idHotelContract);
+        roomPlanSeasonHotelContractService.deleteRoomPlanSeasonHotelContractByIdHotelContract(idHotelContract);
 
         int idContract = getHotelContractById(idHotelContract).getIdContract();
 

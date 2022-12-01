@@ -36,6 +36,12 @@ public class AlimentaryPlanController {
         return ResponseEntity.ok(alimentaryPlan);
     }
 
+    @GetMapping("/name/{name}")
+    public ResponseEntity<AlimentaryPlanDto> getByName(@PathVariable String name) throws SQLException {
+        AlimentaryPlanDto alimentaryPlan = alimentaryPlanService.getAlimentaryPlanByName(name);
+        return ResponseEntity.ok(alimentaryPlan);
+    }
+
     @PostMapping("/")
     public ResponseEntity<String> create(@RequestBody AlimentaryPlanDto alimentaryPlan) throws SQLException {
         alimentaryPlanService.createAlimentaryPlan(alimentaryPlan);

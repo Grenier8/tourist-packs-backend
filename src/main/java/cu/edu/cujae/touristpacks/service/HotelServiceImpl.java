@@ -247,7 +247,7 @@ public class HotelServiceImpl implements IHotelService {
 
     @Override
     public void deleteHotel(int idHotel) throws SQLException {
-        hotelHotelModalityService.deleteHotelHotelModalityByHotel(idHotel);
+        hotelHotelModalityService.deleteHotelHotelModalityByIdHotel(idHotel);
 
         String function = "{call hotel_delete(?)}";
 

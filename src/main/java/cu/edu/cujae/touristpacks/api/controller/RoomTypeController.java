@@ -36,6 +36,12 @@ public class RoomTypeController {
         return ResponseEntity.ok(roomType);
     }
 
+    @GetMapping("/name/{name}")
+    public ResponseEntity<RoomTypeDto> getByName(@PathVariable String name) throws SQLException {
+        RoomTypeDto roomType = roomTypeService.getRoomTypeByName(name);
+        return ResponseEntity.ok(roomType);
+    }
+
     @PostMapping("/")
     public ResponseEntity<String> create(@RequestBody RoomTypeDto roomType) throws SQLException {
         roomTypeService.createRoomType(roomType);

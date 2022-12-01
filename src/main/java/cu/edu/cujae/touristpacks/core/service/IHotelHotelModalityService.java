@@ -17,7 +17,7 @@ public interface IHotelHotelModalityService {
 
     void deleteHotelHotelModality(int idHotelHotelModality) throws SQLException;
 
-    void deleteHotelHotelModalityByHotel(int idHotel) throws SQLException;
+    void deleteHotelHotelModalityByIdHotel(int idHotel) throws SQLException;
 
     List<HotelModalityDto> getHotelModalitiesByIdHotel(int idHotel) throws SQLException;
 
