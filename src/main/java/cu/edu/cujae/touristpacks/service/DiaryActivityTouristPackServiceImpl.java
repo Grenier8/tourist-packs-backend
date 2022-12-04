@@ -130,4 +130,55 @@ public class DiaryActivityTouristPackServiceImpl implements IDiaryActivityTouris
 
     }
 
+    @Override
+    public List<DiaryActivityDto> getDiaryActivitiesByIdTouristPack(int idTouristPack) throws SQLException {
+        List<DiaryActivityDto> list = new ArrayList<>();
+
+        try (Connection connection = jdbcTemplate.getDataSource().getConnection()) {
+            PreparedStatement pstmt = connection.prepareStatement(
+                    "SELECT * FROM diary_activity_turist_pack where id_pack = ?");
+
+            pstmt.setInt(1, idTouristPack);
+
+            ResultSet resultSet = pstmt.executeQuery();
+
+            while (resultSet.next()) {
+                int idDiaryActivity = resultSet.getInt(2);
+
+                list.add(diaryActivityService.getDiaryActivityById(idDiaryActivity));
+
+            }
+        }
+        return list;
+    }
+
+    @Override
+    public void deleteDiaryActivityTouristPackByIds(int idTouristPack, int idDiaryActivity) throws SQLException {
+        try (Connection connection = jdbcTemplate.getDataSource().getConnection()) {
+            PreparedStatement pstmt = connection.prepareStatement(
+                    "DELETE FROM diary_activity_turist_pack where id_pack = ? AND id_activity = ?");
+
+            pstmt.setInt(1, idTouristPack);
+            pstmt.setInt(2, idDiaryActivity);
+
+            pstmt.executeUpdate();
+
+        }
+
+    }
+
+    @Override
+    public void deleteDiaryActivityTouristPackByIdTouristPack(int idTouristPack) throws SQLException {
+        try (Connection connection = jdbcTemplate.getDataSource().getConnection()) {
+            PreparedStatement pstmt = connection.prepareStatement(
+                    "DELETE FROM diary_activity_turist_pack where id_pack = ?");
+
+            pstmt.setInt(1, idTouristPack);
+
+            pstmt.executeUpdate();
+
+        }
+
+    }
+
 }

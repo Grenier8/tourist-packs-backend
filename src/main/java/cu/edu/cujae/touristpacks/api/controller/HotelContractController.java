@@ -18,7 +18,7 @@ import cu.edu.cujae.touristpacks.core.dto.HotelContractDto;
 import cu.edu.cujae.touristpacks.core.service.IHotelContractService;
 
 @RestController
-@RequestMapping("/api/v1/hotelContracts")
+@RequestMapping("/api/v1/hotel_contracts")
 public class HotelContractController {
 
     @Autowired
@@ -33,6 +33,12 @@ public class HotelContractController {
     @GetMapping("/{id}")
     public ResponseEntity<HotelContractDto> getById(@PathVariable Integer id) throws SQLException {
         HotelContractDto hotelContract = hotelContractService.getHotelContractById(id);
+        return ResponseEntity.ok(hotelContract);
+    }
+
+    @GetMapping("/title/{title}")
+    public ResponseEntity<HotelContractDto> getByTitle(@PathVariable String title) throws SQLException {
+        HotelContractDto hotelContract = hotelContractService.getHotelContractByTitle(title);
         return ResponseEntity.ok(hotelContract);
     }
 

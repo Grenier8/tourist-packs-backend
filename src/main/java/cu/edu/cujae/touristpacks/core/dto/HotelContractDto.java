@@ -1,6 +1,7 @@
 package cu.edu.cujae.touristpacks.core.dto;
 
 import java.time.LocalDate;
+import java.util.List;
 
 public class HotelContractDto extends ContractDto {
 
@@ -8,6 +9,7 @@ public class HotelContractDto extends ContractDto {
 	private String contractDescription;
 	private boolean active;
 	private HotelDto hotel;
+	private List<RoomPlanSeasonDto> roomPlanSeasons;
 
 	public HotelContractDto() {
 
@@ -15,17 +17,19 @@ public class HotelContractDto extends ContractDto {
 
 	public HotelContractDto(int idContract, String contractTitle, LocalDate startDate, LocalDate endDate,
 			LocalDate conciliationDate,
-			String contractDescription, HotelDto hotel) {
+			String contractDescription, HotelDto hotel, List<RoomPlanSeasonDto> roomPlanSeasons) {
 		super(idContract, contractTitle, startDate, endDate, conciliationDate);
 		this.contractDescription = contractDescription;
 		this.hotel = hotel;
+		this.roomPlanSeasons = roomPlanSeasons;
 	}
 
 	public HotelContractDto(int idHotelContract, int idContract, String contractTitle, LocalDate startDate,
 			LocalDate endDate,
 			LocalDate conciliationDate,
-			String contractDescription, HotelDto hotel) {
-		this(idContract, contractTitle, startDate, endDate, conciliationDate, contractDescription, hotel);
+			String contractDescription, HotelDto hotel, List<RoomPlanSeasonDto> roomPlanSeasons) {
+		this(idContract, contractTitle, startDate, endDate, conciliationDate, contractDescription, hotel,
+				roomPlanSeasons);
 		this.idHotelContract = idHotelContract;
 	}
 
@@ -63,6 +67,14 @@ public class HotelContractDto extends ContractDto {
 
 	public void setHotel(HotelDto hotel) {
 		this.hotel = hotel;
+	}
+
+	public List<RoomPlanSeasonDto> getRoomPlanSeasons() {
+		return this.roomPlanSeasons;
+	}
+
+	public void setRoomPlanSeasons(List<RoomPlanSeasonDto> roomPlanSeasons) {
+		this.roomPlanSeasons = roomPlanSeasons;
 	}
 
 }

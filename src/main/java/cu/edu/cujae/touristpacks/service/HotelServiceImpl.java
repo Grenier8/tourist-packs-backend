@@ -2,8 +2,11 @@ package cu.edu.cujae.touristpacks.service;
 
 import cu.edu.cujae.touristpacks.core.dto.HotelChainDto;
 import cu.edu.cujae.touristpacks.core.dto.HotelDto;
+import cu.edu.cujae.touristpacks.core.dto.HotelHotelModalityDto;
+import cu.edu.cujae.touristpacks.core.dto.HotelModalityDto;
 import cu.edu.cujae.touristpacks.core.dto.ProvinceDto;
 import cu.edu.cujae.touristpacks.core.service.IHotelChainService;
+import cu.edu.cujae.touristpacks.core.service.IHotelHotelModalityService;
 import cu.edu.cujae.touristpacks.core.service.IHotelService;
 import cu.edu.cujae.touristpacks.core.service.IProvinceService;
 
@@ -31,6 +34,9 @@ public class HotelServiceImpl implements IHotelService {
 
     @Autowired
     private IProvinceService provinceService;
+
+    @Autowired
+    private IHotelHotelModalityService hotelHotelModalityService;
 
     @Override
     public List<HotelDto> getHotels() throws SQLException {
@@ -64,10 +70,12 @@ public class HotelServiceImpl implements IHotelService {
 
                 HotelChainDto hotelChain = hotelChainService.getHotelChainById(idChain);
                 ProvinceDto province = provinceService.getProvinceById(idProvince);
+                List<HotelModalityDto> hotelModalities = hotelHotelModalityService
+                        .getHotelModalitiesByIdHotel(idHotel);
 
                 HotelDto dto = new HotelDto(idHotel, hotelName, address, category, telephoneNumber, fax, email,
                         distanceToNearestCity, distanceToAirport, roomsAmount, levelsAmount, localization, hotelChain,
-                        province);
+                        province, hotelModalities);
                 list.add(dto);
             }
         }
@@ -104,74 +112,16 @@ public class HotelServiceImpl implements IHotelService {
 
                 HotelChainDto hotelChain = hotelChainService.getHotelChainById(idChain);
                 ProvinceDto province = provinceService.getProvinceById(idProvince);
+                List<HotelModalityDto> hotelModalities = hotelHotelModalityService
+                        .getHotelModalitiesByIdHotel(idHotel);
 
                 hotel = new HotelDto(idHotel, hotelName, address, category, telephoneNumber, fax, email,
                         distanceToNearestCity, distanceToAirport, roomsAmount, levelsAmount, localization, hotelChain,
-                        province);
+                        province, hotelModalities);
             }
         }
 
         return hotel;
-    }
-
-    @Override
-    public void createHotel(HotelDto hotel) throws SQLException {
-        String function = "{call hotel_insert(?,?,?,?,?,?,?,?,?,?,?,?,?)}";
-
-        try (Connection connection = jdbcTemplate.getDataSource().getConnection()) {
-            CallableStatement statement = connection.prepareCall(function);
-            statement.setString(1, hotel.getHotelName());
-            statement.setString(2, hotel.getAddress());
-            statement.setString(3, hotel.getTelephoneNumber());
-            statement.setInt(4, hotel.getCategory());
-            statement.setString(5, hotel.getFax());
-            statement.setString(6, hotel.getEmail());
-            statement.setDouble(7, hotel.getDistanceToAirport());
-            statement.setDouble(8, hotel.getDistanceToNearestCity());
-            statement.setInt(9, hotel.getRoomsAmount());
-            statement.setInt(10, hotel.getLevelsAmount());
-            statement.setString(11, hotel.getLocalization());
-            statement.setInt(12, hotel.getHotelChain().getIdHotelChain());
-            statement.setInt(13, hotel.getProvince().getIdProvince());
-            statement.execute();
-        }
-
-    }
-
-    @Override
-    public void updateHotel(HotelDto hotel) throws SQLException {
-        String function = "{call hotel_update(?,?,?,?,?,?,?,?,?,?,?,?,?,?)}";
-
-        try (Connection connection = jdbcTemplate.getDataSource().getConnection()) {
-            CallableStatement statement = connection.prepareCall(function);
-            statement.setInt(1, hotel.getIdHotel());
-            statement.setString(2, hotel.getHotelName());
-            statement.setString(3, hotel.getAddress());
-            statement.setString(4, hotel.getTelephoneNumber());
-            statement.setInt(5, hotel.getCategory());
-            statement.setString(6, hotel.getFax());
-            statement.setString(7, hotel.getEmail());
-            statement.setDouble(8, hotel.getDistanceToAirport());
-            statement.setDouble(9, hotel.getDistanceToNearestCity());
-            statement.setInt(10, hotel.getRoomsAmount());
-            statement.setInt(11, hotel.getLevelsAmount());
-            statement.setString(12, hotel.getLocalization());
-            statement.setInt(13, hotel.getHotelChain().getIdHotelChain());
-            statement.setInt(14, hotel.getProvince().getIdProvince());
-            statement.execute();
-        }
-    }
-
-    @Override
-    public void deleteHotel(int idHotelChain) throws SQLException {
-        String function = "{call hotel_delete(?)}";
-
-        try (Connection connection = jdbcTemplate.getDataSource().getConnection()) {
-            CallableStatement statement = connection.prepareCall(function);
-            statement.setInt(1, idHotelChain);
-            statement.execute();
-        }
-
     }
 
     @Override
@@ -203,13 +153,110 @@ public class HotelServiceImpl implements IHotelService {
 
                 HotelChainDto hotelChain = hotelChainService.getHotelChainById(idChain);
                 ProvinceDto province = provinceService.getProvinceById(idProvince);
+                List<HotelModalityDto> hotelModalities = hotelHotelModalityService
+                        .getHotelModalitiesByIdHotel(idHotel);
 
                 hotel = new HotelDto(idHotel, hotelName, address, category, telephoneNumber, fax, email,
                         distanceToNearestCity, distanceToAirport, roomsAmount, levelsAmount, localization, hotelChain,
-                        province);
+                        province, hotelModalities);
             }
         }
 
         return hotel;
     }
+
+    @Override
+    public void createHotel(HotelDto hotel) throws SQLException {
+        String function = "{call hotel_insert(?,?,?,?,?,?,?,?,?,?,?,?,?)}";
+
+        try (Connection connection = jdbcTemplate.getDataSource().getConnection()) {
+            CallableStatement statement = connection.prepareCall(function);
+            statement.setString(1, hotel.getHotelName());
+            statement.setString(2, hotel.getAddress());
+            statement.setString(3, hotel.getTelephoneNumber());
+            statement.setInt(4, hotel.getCategory());
+            statement.setString(5, hotel.getFax());
+            statement.setString(6, hotel.getEmail());
+            statement.setDouble(7, hotel.getDistanceToAirport());
+            statement.setDouble(8, hotel.getDistanceToNearestCity());
+            statement.setInt(9, hotel.getRoomsAmount());
+            statement.setInt(10, hotel.getLevelsAmount());
+            statement.setString(11, hotel.getLocalization());
+            statement.setInt(12, hotel.getHotelChain().getIdHotelChain());
+            statement.setInt(13, hotel.getProvince().getIdProvince());
+            statement.execute();
+        }
+
+        HotelDto insertedHotel = getHotelByName(hotel.getHotelName());
+
+        for (HotelModalityDto hotelModality : hotel.getHotelModalities()) {
+            HotelHotelModalityDto hotelHotelModality = new HotelHotelModalityDto(insertedHotel, hotelModality);
+            hotelHotelModalityService.createHotelHotelModality(hotelHotelModality);
+        }
+
+    }
+
+    @Override
+    public void updateHotel(HotelDto hotel) throws SQLException {
+        String function = "{call hotel_update(?,?,?,?,?,?,?,?,?,?,?,?,?,?)}";
+
+        try (Connection connection = jdbcTemplate.getDataSource().getConnection()) {
+            CallableStatement statement = connection.prepareCall(function);
+            statement.setInt(1, hotel.getIdHotel());
+            statement.setString(2, hotel.getHotelName());
+            statement.setString(3, hotel.getAddress());
+            statement.setString(4, hotel.getTelephoneNumber());
+            statement.setInt(5, hotel.getCategory());
+            statement.setString(6, hotel.getFax());
+            statement.setString(7, hotel.getEmail());
+            statement.setDouble(8, hotel.getDistanceToAirport());
+            statement.setDouble(9, hotel.getDistanceToNearestCity());
+            statement.setInt(10, hotel.getRoomsAmount());
+            statement.setInt(11, hotel.getLevelsAmount());
+            statement.setString(12, hotel.getLocalization());
+            statement.setInt(13, hotel.getHotelChain().getIdHotelChain());
+            statement.setInt(14, hotel.getProvince().getIdProvince());
+            statement.execute();
+        }
+
+        List<HotelModalityDto> formerHotelModalities = hotelHotelModalityService
+                .getHotelModalitiesByIdHotel(hotel.getIdHotel());
+        List<HotelModalityDto> newHotelModalities = hotel.getHotelModalities();
+
+        for (HotelModalityDto formerHotelModality : formerHotelModalities) {
+            boolean deleted = true;
+            for (HotelModalityDto newHotelModality : newHotelModalities) {
+                if (formerHotelModality.getIdHotelModality() == newHotelModality
+                        .getIdHotelModality()) {
+                    deleted = false;
+                    newHotelModalities.remove(newHotelModality);
+                    break;
+                }
+            }
+            if (deleted) {
+                hotelHotelModalityService.deleteHotelHotelModalityByIds(hotel.getIdHotel(),
+                        formerHotelModality.getIdHotelModality());
+            }
+        }
+
+        for (HotelModalityDto newHotelModality : newHotelModalities) {
+            hotelHotelModalityService.createHotelHotelModality(new HotelHotelModalityDto(hotel, newHotelModality));
+        }
+
+    }
+
+    @Override
+    public void deleteHotel(int idHotel) throws SQLException {
+        hotelHotelModalityService.deleteHotelHotelModalityByIdHotel(idHotel);
+
+        String function = "{call hotel_delete(?)}";
+
+        try (Connection connection = jdbcTemplate.getDataSource().getConnection()) {
+            CallableStatement statement = connection.prepareCall(function);
+            statement.setInt(1, idHotel);
+            statement.execute();
+        }
+
+    }
+
 }

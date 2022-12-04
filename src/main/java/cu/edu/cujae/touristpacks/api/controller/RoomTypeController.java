@@ -18,7 +18,7 @@ import cu.edu.cujae.touristpacks.core.dto.RoomTypeDto;
 import cu.edu.cujae.touristpacks.core.service.IRoomTypeService;
 
 @RestController
-@RequestMapping("/api/v1/roomTypes")
+@RequestMapping("/api/v1/room_types")
 public class RoomTypeController {
 
     @Autowired
@@ -33,6 +33,12 @@ public class RoomTypeController {
     @GetMapping("/{id}")
     public ResponseEntity<RoomTypeDto> getById(@PathVariable Integer id) throws SQLException {
         RoomTypeDto roomType = roomTypeService.getRoomTypeById(id);
+        return ResponseEntity.ok(roomType);
+    }
+
+    @GetMapping("/name/{name}")
+    public ResponseEntity<RoomTypeDto> getByName(@PathVariable String name) throws SQLException {
+        RoomTypeDto roomType = roomTypeService.getRoomTypeByName(name);
         return ResponseEntity.ok(roomType);
     }
 

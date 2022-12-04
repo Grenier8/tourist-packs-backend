@@ -12,6 +12,7 @@ import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.PutMapping;
 import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
+import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.RestController;
 
 import cu.edu.cujae.touristpacks.core.dto.HotelModalityDto;
@@ -33,6 +34,12 @@ public class HotelModalityController {
     @GetMapping("/{id}")
     public ResponseEntity<HotelModalityDto> getById(@PathVariable Integer id) throws SQLException {
         HotelModalityDto hotelModality = hotelModalityService.getHotelModalityById(id);
+        return ResponseEntity.ok(hotelModality);
+    }
+
+    @GetMapping("/name/{name}")
+    public ResponseEntity<HotelModalityDto> getByName(@PathVariable String name) throws SQLException {
+        HotelModalityDto hotelModality = hotelModalityService.getHotelModalityByName(name);
         return ResponseEntity.ok(hotelModality);
     }
 

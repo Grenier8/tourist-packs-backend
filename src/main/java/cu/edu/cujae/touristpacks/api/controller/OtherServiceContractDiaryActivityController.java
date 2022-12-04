@@ -18,7 +18,7 @@ import cu.edu.cujae.touristpacks.core.dto.OtherServiceContractDiaryActivityDto;
 import cu.edu.cujae.touristpacks.core.service.IOtherServiceContractDiaryActivityService;
 
 @RestController
-@RequestMapping("/api/v1/otherServiceContractDiaryActivities")
+@RequestMapping("/api/v1/other_service_contract_diary_activities")
 public class OtherServiceContractDiaryActivityController {
 
     @Autowired

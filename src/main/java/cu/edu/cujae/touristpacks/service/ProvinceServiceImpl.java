@@ -120,7 +120,7 @@ public class ProvinceServiceImpl implements IProvinceService {
             ResultSet resultSet = pstmt.executeQuery();
 
             while (resultSet.next()) {
-                int idProvince = resultSet.getInt(2);
+                int idProvince = resultSet.getInt(1);
 
                 province = new ProvinceDto(idProvince, provinceName);
             }

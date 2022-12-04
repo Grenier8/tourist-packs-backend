@@ -82,7 +82,7 @@ public class AlimentaryPlanServiceImpl implements IAlimentaryPlanService {
             ResultSet resultSet = pstmt.executeQuery();
 
             while (resultSet.next()) {
-                int idAlimentaryPlan = resultSet.getInt(2);
+                int idAlimentaryPlan = resultSet.getInt(1);
 
                 alimentaryPlan = new AlimentaryPlanDto(idAlimentaryPlan, alimentaryPlanName);
             }

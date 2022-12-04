@@ -18,7 +18,7 @@ import cu.edu.cujae.touristpacks.core.dto.RoomPlanSeasonDto;
 import cu.edu.cujae.touristpacks.core.service.IRoomPlanSeasonService;
 
 @RestController
-@RequestMapping("/api/v1/roomPlanSeasons")
+@RequestMapping("/api/v1/room_plan_seasons")
 public class RoomPlanSeasonController {
 
     @Autowired
@@ -33,6 +33,12 @@ public class RoomPlanSeasonController {
     @GetMapping("/{id}")
     public ResponseEntity<RoomPlanSeasonDto> getById(@PathVariable Integer id) throws SQLException {
         RoomPlanSeasonDto roomPlanSeason = roomPlanSeasonService.getRoomPlanSeasonById(id);
+        return ResponseEntity.ok(roomPlanSeason);
+    }
+
+    @GetMapping("/name/{name}")
+    public ResponseEntity<RoomPlanSeasonDto> getByName(@PathVariable String name) throws SQLException {
+        RoomPlanSeasonDto roomPlanSeason = roomPlanSeasonService.getRoomPlanSeasonByName(name);
         return ResponseEntity.ok(roomPlanSeason);
     }
 

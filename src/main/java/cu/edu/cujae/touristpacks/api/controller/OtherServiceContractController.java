@@ -18,7 +18,7 @@ import cu.edu.cujae.touristpacks.core.dto.OtherServiceContractDto;
 import cu.edu.cujae.touristpacks.core.service.IOtherServiceContractService;
 
 @RestController
-@RequestMapping("/api/v1/otherServiceContracts")
+@RequestMapping("/api/v1/other_service_contracts")
 public class OtherServiceContractController {
 
     @Autowired
@@ -33,6 +33,13 @@ public class OtherServiceContractController {
     @GetMapping("/{id}")
     public ResponseEntity<OtherServiceContractDto> getById(@PathVariable Integer id) throws SQLException {
         OtherServiceContractDto otherServiceContract = otherServiceContractService.getOtherServiceContractById(id);
+        return ResponseEntity.ok(otherServiceContract);
+    }
+
+    @GetMapping("/title/{title}")
+    public ResponseEntity<OtherServiceContractDto> getByTitle(@PathVariable String title) throws SQLException {
+        OtherServiceContractDto otherServiceContract = otherServiceContractService
+                .getOtherServiceContractByTitle(title);
         return ResponseEntity.ok(otherServiceContract);
     }
 

@@ -18,7 +18,7 @@ import cu.edu.cujae.touristpacks.core.dto.AlimentaryPlanDto;
 import cu.edu.cujae.touristpacks.core.service.IAlimentaryPlanService;
 
 @RestController
-@RequestMapping("/api/v1/alimentaryPlans")
+@RequestMapping("/api/v1/alimentary_plans")
 public class AlimentaryPlanController {
 
     @Autowired
@@ -33,6 +33,12 @@ public class AlimentaryPlanController {
     @GetMapping("/{id}")
     public ResponseEntity<AlimentaryPlanDto> getById(@PathVariable Integer id) throws SQLException {
         AlimentaryPlanDto alimentaryPlan = alimentaryPlanService.getAlimentaryPlanById(id);
+        return ResponseEntity.ok(alimentaryPlan);
+    }
+
+    @GetMapping("/name/{name}")
+    public ResponseEntity<AlimentaryPlanDto> getByName(@PathVariable String name) throws SQLException {
+        AlimentaryPlanDto alimentaryPlan = alimentaryPlanService.getAlimentaryPlanByName(name);
         return ResponseEntity.ok(alimentaryPlan);
     }
 

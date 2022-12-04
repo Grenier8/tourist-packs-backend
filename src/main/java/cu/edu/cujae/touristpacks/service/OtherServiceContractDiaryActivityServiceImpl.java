@@ -38,27 +38,28 @@ public class OtherServiceContractDiaryActivityServiceImpl implements IOtherServi
 
         String function = "{?= call select_all_other_service_contract_diary_activity()}";
 
-        Connection connection = jdbcTemplate.getDataSource().getConnection();
-        connection.setAutoCommit(false);
-        CallableStatement statement = connection.prepareCall(function);
-        statement.registerOutParameter(1, Types.OTHER);
-        statement.execute();
+        try (Connection connection = jdbcTemplate.getDataSource().getConnection()) {
+            connection.setAutoCommit(false);
+            CallableStatement statement = connection.prepareCall(function);
+            statement.registerOutParameter(1, Types.OTHER);
+            statement.execute();
 
-        ResultSet resultSet = (ResultSet) statement.getObject(1);
+            ResultSet resultSet = (ResultSet) statement.getObject(1);
 
-        while (resultSet.next()) {
-            int idOtherServiceContractDiaryActivity = resultSet.getInt(1);
-            int idOtherServiceContract = resultSet.getInt(2);
-            int idDiaryActivity = resultSet.getInt(3);
-            double activityPrice = resultSet.getDouble(4);
+            while (resultSet.next()) {
+                int idOtherServiceContractDiaryActivity = resultSet.getInt(1);
+                int idOtherServiceContract = resultSet.getInt(2);
+                int idDiaryActivity = resultSet.getInt(3);
+                double activityPrice = resultSet.getDouble(4);
 
-            OtherServiceContractDto otherServiceContract = otherServiceContractService
-                    .getOtherServiceContractById(idOtherServiceContract);
-            DiaryActivityDto diaryActivity = diaryActivityService.getDiaryActivityById(idDiaryActivity);
+                OtherServiceContractDto otherServiceContract = otherServiceContractService
+                        .getOtherServiceContractById(idOtherServiceContract);
+                DiaryActivityDto diaryActivity = diaryActivityService.getDiaryActivityById(idDiaryActivity);
 
-            OtherServiceContractDiaryActivityDto dto = new OtherServiceContractDiaryActivityDto(
-                    idOtherServiceContractDiaryActivity, activityPrice, otherServiceContract, diaryActivity);
-            list.add(dto);
+                OtherServiceContractDiaryActivityDto dto = new OtherServiceContractDiaryActivityDto(
+                        idOtherServiceContractDiaryActivity, activityPrice, otherServiceContract, diaryActivity);
+                list.add(dto);
+            }
         }
 
         return list;
@@ -69,24 +70,26 @@ public class OtherServiceContractDiaryActivityServiceImpl implements IOtherServi
             int idOtherServiceContractDiaryActivity) throws SQLException {
         OtherServiceContractDiaryActivityDto otherServiceContractDiaryActivity = null;
 
-        PreparedStatement pstmt = jdbcTemplate.getDataSource().getConnection().prepareStatement(
-                "SELECT * FROM other_service_contract_diary_activity where id_other_service_contract_diary_activity = ?");
+        try (Connection connection = jdbcTemplate.getDataSource().getConnection()) {
+            PreparedStatement pstmt = connection.prepareStatement(
+                    "SELECT * FROM other_service_contract_diary_activity where id_other_service_contract_diary_activity = ?");
 
-        pstmt.setInt(1, idOtherServiceContractDiaryActivity);
+            pstmt.setInt(1, idOtherServiceContractDiaryActivity);
 
-        ResultSet resultSet = pstmt.executeQuery();
+            ResultSet resultSet = pstmt.executeQuery();
 
-        while (resultSet.next()) {
-            int idOtherServiceContract = resultSet.getInt(2);
-            int idDiaryActivity = resultSet.getInt(3);
-            double activityPrice = resultSet.getDouble(4);
+            while (resultSet.next()) {
+                int idOtherServiceContract = resultSet.getInt(2);
+                int idDiaryActivity = resultSet.getInt(3);
+                double activityPrice = resultSet.getDouble(4);
 
-            OtherServiceContractDto otherServiceContract = otherServiceContractService
-                    .getOtherServiceContractById(idOtherServiceContract);
-            DiaryActivityDto diaryActivity = diaryActivityService.getDiaryActivityById(idDiaryActivity);
+                OtherServiceContractDto otherServiceContract = otherServiceContractService
+                        .getOtherServiceContractById(idOtherServiceContract);
+                DiaryActivityDto diaryActivity = diaryActivityService.getDiaryActivityById(idDiaryActivity);
 
-            otherServiceContractDiaryActivity = new OtherServiceContractDiaryActivityDto(
-                    idOtherServiceContractDiaryActivity, activityPrice, otherServiceContract, diaryActivity);
+                otherServiceContractDiaryActivity = new OtherServiceContractDiaryActivityDto(
+                        idOtherServiceContractDiaryActivity, activityPrice, otherServiceContract, diaryActivity);
+            }
         }
 
         return otherServiceContractDiaryActivity;
@@ -97,11 +100,14 @@ public class OtherServiceContractDiaryActivityServiceImpl implements IOtherServi
             OtherServiceContractDiaryActivityDto otherServiceContractDiaryActivity) throws SQLException {
         String function = "{call other_service_contract_diary_activity_insert(?,?,?)}";
 
-        CallableStatement statement = jdbcTemplate.getDataSource().getConnection().prepareCall(function);
-        statement.setInt(1, otherServiceContractDiaryActivity.getOtherServiceContract().getIdOtherServiceContract());
-        statement.setInt(2, otherServiceContractDiaryActivity.getDiaryActivity().getIdDiaryActivity());
-        statement.setDouble(3, otherServiceContractDiaryActivity.getActivityPrice());
-        statement.execute();
+        try (Connection connection = jdbcTemplate.getDataSource().getConnection()) {
+            CallableStatement statement = connection.prepareCall(function);
+            statement.setInt(1,
+                    otherServiceContractDiaryActivity.getOtherServiceContract().getIdOtherServiceContract());
+            statement.setInt(2, otherServiceContractDiaryActivity.getDiaryActivity().getIdDiaryActivity());
+            statement.setDouble(3, otherServiceContractDiaryActivity.getActivityPrice());
+            statement.execute();
+        }
 
     }
 
@@ -110,12 +116,15 @@ public class OtherServiceContractDiaryActivityServiceImpl implements IOtherServi
             OtherServiceContractDiaryActivityDto otherServiceContractDiaryActivity) throws SQLException {
         String function = "{call other_service_contract_diary_activity_update(?,?,?,?)}";
 
-        CallableStatement statement = jdbcTemplate.getDataSource().getConnection().prepareCall(function);
-        statement.setInt(1, otherServiceContractDiaryActivity.getIdOtherServiceContractDiaryActivity());
-        statement.setInt(2, otherServiceContractDiaryActivity.getOtherServiceContract().getIdOtherServiceContract());
-        statement.setInt(3, otherServiceContractDiaryActivity.getDiaryActivity().getIdDiaryActivity());
-        statement.setDouble(4, otherServiceContractDiaryActivity.getActivityPrice());
-        statement.execute();
+        try (Connection connection = jdbcTemplate.getDataSource().getConnection()) {
+            CallableStatement statement = connection.prepareCall(function);
+            statement.setInt(1, otherServiceContractDiaryActivity.getIdOtherServiceContractDiaryActivity());
+            statement.setInt(2,
+                    otherServiceContractDiaryActivity.getOtherServiceContract().getIdOtherServiceContract());
+            statement.setInt(3, otherServiceContractDiaryActivity.getDiaryActivity().getIdDiaryActivity());
+            statement.setDouble(4, otherServiceContractDiaryActivity.getActivityPrice());
+            statement.execute();
+        }
 
     }
 
@@ -123,9 +132,64 @@ public class OtherServiceContractDiaryActivityServiceImpl implements IOtherServi
     public void deleteOtherServiceContractDiaryActivity(int idOtherServiceContractDiaryActivity) throws SQLException {
         String function = "{call other_service_contract_diary_activity_delete(?)}";
 
-        CallableStatement statement = jdbcTemplate.getDataSource().getConnection().prepareCall(function);
-        statement.setInt(1, idOtherServiceContractDiaryActivity);
-        statement.execute();
+        try (Connection connection = jdbcTemplate.getDataSource().getConnection()) {
+            CallableStatement statement = connection.prepareCall(function);
+            statement.setInt(1, idOtherServiceContractDiaryActivity);
+            statement.execute();
+        }
+
+    }
+
+    @Override
+    public List<DiaryActivityDto> getDiaryActivitiesByIdOtherServiceContract(int idOtherServiceContract)
+            throws SQLException {
+        List<DiaryActivityDto> list = new ArrayList<>();
+
+        try (Connection connection = jdbcTemplate.getDataSource().getConnection()) {
+            PreparedStatement pstmt = connection.prepareStatement(
+                    "SELECT * FROM other_service_contract_diary_activity where id_other_service_contract = ?");
+
+            pstmt.setInt(1, idOtherServiceContract);
+
+            ResultSet resultSet = pstmt.executeQuery();
+
+            while (resultSet.next()) {
+                int idDiaryActivity = resultSet.getInt(3);
+
+                list.add(diaryActivityService.getDiaryActivityById(idDiaryActivity));
+
+            }
+        }
+        return list;
+    }
+
+    @Override
+    public void deleteOtherServiceContractDiaryActivityByIdOtherServiceContract(int idOtherServiceContract)
+            throws SQLException {
+        try (Connection connection = jdbcTemplate.getDataSource().getConnection()) {
+            PreparedStatement pstmt = connection.prepareStatement(
+                    "DELETE FROM other_service_contract_diary_activity where id_other_service_contract = ?");
+
+            pstmt.setInt(1, idOtherServiceContract);
+
+            pstmt.executeUpdate();
+
+        }
+
+    }
+
+    @Override
+    public void deleteHotelDiaryActivityByIds(int idOtherServiceContract, int idDiaryActivity) throws SQLException {
+        try (Connection connection = jdbcTemplate.getDataSource().getConnection()) {
+            PreparedStatement pstmt = connection.prepareStatement(
+                    "DELETE FROM other_service_contract_diary_activity where id_other_service_contract = ? AND id_activity = ?");
+
+            pstmt.setInt(1, idOtherServiceContract);
+            pstmt.setInt(2, idDiaryActivity);
+
+            pstmt.executeUpdate();
+
+        }
 
     }
 

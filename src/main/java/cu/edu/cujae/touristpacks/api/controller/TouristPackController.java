@@ -36,6 +36,12 @@ public class TouristPackController {
         return ResponseEntity.ok(touristPack);
     }
 
+    @GetMapping("/name/{name}")
+    public ResponseEntity<TouristPackDto> getByName(@PathVariable String name) throws SQLException {
+        TouristPackDto touristPack = touristPackService.getTouristPackByName(name);
+        return ResponseEntity.ok(touristPack);
+    }
+
     @PostMapping("/")
     public ResponseEntity<String> create(@RequestBody TouristPackDto touristPack) throws SQLException {
         touristPackService.createTouristPack(touristPack);

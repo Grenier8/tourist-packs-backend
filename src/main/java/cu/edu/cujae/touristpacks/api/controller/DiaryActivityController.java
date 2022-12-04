@@ -18,7 +18,7 @@ import cu.edu.cujae.touristpacks.core.dto.DiaryActivityDto;
 import cu.edu.cujae.touristpacks.core.service.IDiaryActivityService;
 
 @RestController
-@RequestMapping("/api/v1/diaryActivities")
+@RequestMapping("/api/v1/diary_activities")
 public class DiaryActivityController {
 
     @Autowired
@@ -28,6 +28,12 @@ public class DiaryActivityController {
     public ResponseEntity<List<DiaryActivityDto>> getAll() throws SQLException {
         List<DiaryActivityDto> list = diaryActivityService.getDiaryActivities();
         return ResponseEntity.ok(list);
+    }
+
+    @GetMapping("/name/{name}")
+    public ResponseEntity<DiaryActivityDto> getByName(@PathVariable String name) throws SQLException {
+        DiaryActivityDto diaryActivity = diaryActivityService.getDiaryActivityByName(name);
+        return ResponseEntity.ok(diaryActivity);
     }
 
     @GetMapping("/{id}")

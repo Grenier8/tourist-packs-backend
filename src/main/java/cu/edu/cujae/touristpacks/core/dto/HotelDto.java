@@ -1,5 +1,7 @@
 package cu.edu.cujae.touristpacks.core.dto;
 
+import java.util.List;
+
 public class HotelDto {
 
 	private int idHotel;
@@ -16,13 +18,14 @@ public class HotelDto {
 	private String localization;
 	private HotelChainDto hotelChain;
 	private ProvinceDto province;
+	private List<HotelModalityDto> hotelModalities;
 
 	public HotelDto() {
 	}
 
 	public HotelDto(String hotelName, String address, int category, String telephoneNumber, String fax, String email,
 			double distanceToNearestCity, double distanceToAirport, int roomsAmount, int levelsAmount,
-			String localization, HotelChainDto hotelChain, ProvinceDto province) {
+			String localization, HotelChainDto hotelChain, ProvinceDto province, List<HotelModalityDto> hotelModalities) {
 		this.hotelName = hotelName;
 		this.address = address;
 		this.category = category;
@@ -36,13 +39,14 @@ public class HotelDto {
 		this.localization = localization;
 		this.hotelChain = hotelChain;
 		this.province = province;
+		this.hotelModalities = hotelModalities;
 
 	}
 
 	public HotelDto(int idHotel, String hotelName, String address, int category, String telephoneNumber, String fax,
 			String email,
 			double distanceToNearestCity, double distanceToAirport, int roomsAmount, int levelsAmount,
-			String localization, HotelChainDto hotelChain, ProvinceDto province) {
+			String localization, HotelChainDto hotelChain, ProvinceDto province, List<HotelModalityDto> hotelModalities) {
 		this.idHotel = idHotel;
 		this.hotelName = hotelName;
 		this.address = address;
@@ -57,6 +61,7 @@ public class HotelDto {
 		this.localization = localization;
 		this.hotelChain = hotelChain;
 		this.province = province;
+		this.hotelModalities = hotelModalities;
 
 	}
 
@@ -176,4 +181,14 @@ public class HotelDto {
 	public void setProvince(ProvinceDto province) {
 		this.province = province;
 	}
+
+
+	public List<HotelModalityDto> getHotelModalities() {
+		return this.hotelModalities;
+	}
+
+	public void setHotelModalities(List<HotelModalityDto> hotelModalities) {
+		this.hotelModalities = hotelModalities;
+	}
+
 }

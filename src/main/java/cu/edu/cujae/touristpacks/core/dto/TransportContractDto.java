@@ -19,14 +19,14 @@ public class TransportContractDto extends ContractDto {
 
 	public TransportContractDto(int idTransportContract, String contractTitle, LocalDate startDate, LocalDate endDate,
 			LocalDate conciliationDate, ProviderDto provider) {
-		super(contractTitle, startDate, endDate, conciliationDate);
+		this(contractTitle, startDate, endDate, conciliationDate, provider);
 		this.idTransportContract = idTransportContract;
-		this.provider = provider;
 	}
 
-	public TransportContractDto(String contractTitle, LocalDate startDate, LocalDate endDate,
-			LocalDate conciliationDate, int idTransportContract, ProviderDto provider) {
-		super(contractTitle, startDate, endDate, conciliationDate);
+	public TransportContractDto(int idTransportContract, int idContract, String contractTitle, LocalDate startDate,
+			LocalDate endDate,
+			LocalDate conciliationDate, ProviderDto provider) {
+		super(idContract, contractTitle, startDate, endDate, conciliationDate);
 		this.idTransportContract = idTransportContract;
 		this.provider = provider;
 	}

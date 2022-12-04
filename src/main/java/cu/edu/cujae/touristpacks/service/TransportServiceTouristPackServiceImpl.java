@@ -71,15 +71,15 @@ public class TransportServiceTouristPackServiceImpl implements ITransportService
 
         try (Connection connection = jdbcTemplate.getDataSource().getConnection()) {
             PreparedStatement pstmt = connection.prepareStatement(
-                    "SELECT * FROM transport_service_tourist_pack where id_transport_service_tourist_pack = ?");
+                    "SELECT * FROM transport_service_turist_pack where id_transport_service_turist_pack = ?");
 
             pstmt.setInt(1, idTransportServiceTouristPack);
 
             ResultSet resultSet = pstmt.executeQuery();
 
             while (resultSet.next()) {
-                int idTouristPack = resultSet.getInt(1);
-                int idTransportService = resultSet.getInt(2);
+                int idTouristPack = resultSet.getInt(2);
+                int idTransportService = resultSet.getInt(3);
 
                 TouristPackDto touristPack = touristPackService.getTouristPackById(idTouristPack);
                 TransportServiceDto transportService = transportServiceService
@@ -96,7 +96,7 @@ public class TransportServiceTouristPackServiceImpl implements ITransportService
     @Override
     public void createTransportServiceTouristPack(TransportServiceTouristPackDto transportServiceTouristPack)
             throws SQLException {
-        String function = "{call transport_service_tourist_pack_insert(?)}";
+        String function = "{call transport_service_turist_pack_insert(?,?)}";
 
         try (Connection connection = jdbcTemplate.getDataSource().getConnection()) {
             CallableStatement statement = connection.prepareCall(function);
@@ -109,7 +109,7 @@ public class TransportServiceTouristPackServiceImpl implements ITransportService
     @Override
     public void updateTransportServiceTouristPack(TransportServiceTouristPackDto transportServiceTouristPack)
             throws SQLException {
-        String function = "{call transport_service_tourist_pack_update(?,?)}";
+        String function = "{call transport_service_turist_pack_update(?,?,?)}";
 
         try (Connection connection = jdbcTemplate.getDataSource().getConnection()) {
             CallableStatement statement = connection.prepareCall(function);
@@ -123,12 +123,63 @@ public class TransportServiceTouristPackServiceImpl implements ITransportService
 
     @Override
     public void deleteTransportServiceTouristPack(int idTransportServiceTouristPack) throws SQLException {
-        String function = "{call transport_service_tourist_pack_delete(?)}";
+        String function = "{call transport_service_turist_pack_delete(?)}";
 
         try (Connection connection = jdbcTemplate.getDataSource().getConnection()) {
             CallableStatement statement = connection.prepareCall(function);
             statement.setInt(1, idTransportServiceTouristPack);
             statement.execute();
+        }
+
+    }
+
+    @Override
+    public List<TransportServiceDto> getTransportServicesByIdTouristPack(int idTouristPack) throws SQLException {
+        List<TransportServiceDto> list = new ArrayList<>();
+
+        try (Connection connection = jdbcTemplate.getDataSource().getConnection()) {
+            PreparedStatement pstmt = connection.prepareStatement(
+                    "SELECT * FROM transport_service_turist_pack where id_pack = ?");
+
+            pstmt.setInt(1, idTouristPack);
+
+            ResultSet resultSet = pstmt.executeQuery();
+
+            while (resultSet.next()) {
+                int idTransportService = resultSet.getInt(3);
+
+                list.add(transportServiceService.getTransportServiceById(idTransportService));
+
+            }
+        }
+        return list;
+    }
+
+    @Override
+    public void deleteTransportServiceTouristPackByIdTouristPack(int idTouristPack) throws SQLException {
+        try (Connection connection = jdbcTemplate.getDataSource().getConnection()) {
+            PreparedStatement pstmt = connection.prepareStatement(
+                    "DELETE FROM transport_service_turist_pack where id_pack = ?");
+
+            pstmt.setInt(1, idTouristPack);
+
+            pstmt.executeUpdate();
+
+        }
+
+    }
+
+    @Override
+    public void deleteTransportServiceTouristPackByIds(int idTouristPack, int idTransportService) throws SQLException {
+        try (Connection connection = jdbcTemplate.getDataSource().getConnection()) {
+            PreparedStatement pstmt = connection.prepareStatement(
+                    "DELETE FROM transport_service_turist_pack where id_pack = ? AND id_transport_service = ?");
+
+            pstmt.setInt(1, idTouristPack);
+            pstmt.setInt(2, idTransportService);
+
+            pstmt.executeUpdate();
+
         }
 
     }
