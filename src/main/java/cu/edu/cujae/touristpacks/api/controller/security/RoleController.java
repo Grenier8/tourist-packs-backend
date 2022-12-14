@@ -1,4 +1,4 @@
-package cu.edu.cujae.touristpacks.api.controller;
+package cu.edu.cujae.touristpacks.api.controller.security;
 
 import java.sql.SQLException;
 import java.util.List;
@@ -14,8 +14,8 @@ import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RestController;
 
-import cu.edu.cujae.touristpacks.core.dto.RoleDto;
-import cu.edu.cujae.touristpacks.core.service.IRoleService;
+import cu.edu.cujae.touristpacks.core.dto.security.RoleDto;
+import cu.edu.cujae.touristpacks.core.service.security.IRoleService;
 
 @RestController
 @RequestMapping("/api/v1/roles")

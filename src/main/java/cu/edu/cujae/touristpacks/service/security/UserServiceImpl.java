@@ -1,27 +1,21 @@
-package cu.edu.cujae.touristpacks.service;
+package cu.edu.cujae.touristpacks.service.security;
 
-import java.security.MessageDigest;
-import java.security.NoSuchAlgorithmException;
-import java.sql.CallableStatement;
 import java.sql.Connection;
 import java.sql.PreparedStatement;
 import java.sql.ResultSet;
 import java.sql.SQLException;
 import java.util.ArrayList;
 import java.util.List;
-import java.util.UUID;
-import java.util.stream.Collectors;
-
-import javax.xml.bind.DatatypeConverter;
 
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.jdbc.core.JdbcTemplate;
+import org.springframework.security.crypto.bcrypt.BCryptPasswordEncoder;
 import org.springframework.stereotype.Service;
 
-import cu.edu.cujae.touristpacks.core.dto.RoleDto;
-import cu.edu.cujae.touristpacks.core.dto.UserDto;
-import cu.edu.cujae.touristpacks.core.service.IRoleService;
-import cu.edu.cujae.touristpacks.core.service.IUserService;
+import cu.edu.cujae.touristpacks.core.dto.security.RoleDto;
+import cu.edu.cujae.touristpacks.core.dto.security.UserDto;
+import cu.edu.cujae.touristpacks.core.service.security.IRoleService;
+import cu.edu.cujae.touristpacks.core.service.security.IUserService;
 
 @Service
 public class UserServiceImpl implements IUserService {
@@ -40,7 +34,7 @@ public class UserServiceImpl implements IUserService {
 			PreparedStatement statement = connection.prepareStatement(function);
 
 			statement.setString(1, user.getUsername());
-			statement.setString(2, getMd5Hash(user.getPassword()));
+			statement.setString(2, encodePass(user.getPassword()));
 			statement.setString(3, user.getName());
 			statement.setInt(4, user.getRole().getIdRole());
 			statement.setString(5, user.getEmail());
@@ -82,7 +76,7 @@ public class UserServiceImpl implements IUserService {
 			PreparedStatement statement = connection.prepareStatement(function);
 
 			statement.setString(1, user.getUsername());
-			statement.setString(2, getMd5Hash(user.getPassword()));
+			statement.setString(2, encodePass(user.getPassword()));
 			statement.setString(3, user.getName());
 			statement.setInt(4, user.getRole().getIdRole());
 			statement.setString(5, user.getEmail());
@@ -132,19 +126,52 @@ public class UserServiceImpl implements IUserService {
 		}
 	}
 
-	private String getMd5Hash(String password) {
-		MessageDigest md;
-		String md5Hash = "";
-		try {
-			md = MessageDigest.getInstance("MD5");
-			md.update(password.getBytes());
-			byte[] digest = md.digest();
-			md5Hash = DatatypeConverter
-					.printHexBinary(digest).toUpperCase();
-		} catch (NoSuchAlgorithmException e) {
-			e.printStackTrace();
+	// private String getMd5Hash(String password) {
+	// MessageDigest md;
+	// String md5Hash = "";
+	// try {
+	// md = MessageDigest.getInstance("MD5");
+	// md.update(password.getBytes());
+	// byte[] digest = md.digest();
+	// md5Hash = DatatypeConverter
+	// .printHexBinary(digest).toUpperCase();
+	// } catch (NoSuchAlgorithmException e) {
+	// e.printStackTrace();
+	// }
+	// return md5Hash;
+	// }
+
+	private String encodePass(String password) {
+		return new BCryptPasswordEncoder().encode(password);
+	}
+
+	@Override
+	public UserDto getUserByUsername(String username) throws SQLException {
+		UserDto user = null;
+
+		PreparedStatement pstmt = jdbcTemplate.getDataSource().getConnection().prepareStatement(
+				"SELECT * FROM user_table where username = ?");
+
+		pstmt.setString(1, username);
+
+		ResultSet resultSet = pstmt.executeQuery();
+
+		while (resultSet.next()) {
+			int idUser = resultSet.getInt(1);
+			String password = resultSet.getString(3);
+			String name = resultSet.getString(4);
+			int idRole = resultSet.getInt(5);
+			String email = resultSet.getString(6);
+
+			String as = encodePass("3333");
+			System.out.println(as);
+
+			RoleDto role = roleService.getRoleById(idRole);
+
+			user = new UserDto(idUser, username, password, name, role, email);
 		}
-		return md5Hash;
+
+		return user;
 	}
 
 }
