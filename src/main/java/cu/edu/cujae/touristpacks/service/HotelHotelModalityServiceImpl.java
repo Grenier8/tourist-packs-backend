@@ -2,6 +2,7 @@ package cu.edu.cujae.touristpacks.service;
 
 import java.sql.CallableStatement;
 import java.sql.Connection;
+import java.sql.Date;
 import java.sql.PreparedStatement;
 import java.sql.ResultSet;
 import java.sql.SQLException;
@@ -170,6 +171,8 @@ public class HotelHotelModalityServiceImpl implements IHotelHotelModalityService
 
             pstmt.setInt(1, idHotel);
             pstmt.setInt(2, idHotelModality);
+
+            
 
             pstmt.executeUpdate();
 

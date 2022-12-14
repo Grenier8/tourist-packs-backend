@@ -1,16 +1,17 @@
 {
-    "java.configuration.updateBuildConfiguration": "interactive",
-    "sqltools.connections": [
-        {
-            "previewLimit": 50,
-            "server": "localhost",
-            "port": 5432,
-            "driver": "PostgreSQL",
-            "name": "TouristPacks",
-            "group": "Tourists",
-            "database": "turist_packs",
-            "username": "postgres",
-            "password": "postgres"
-        }
-    ]
+  "java.configuration.updateBuildConfiguration": "interactive",
+  "sqltools.connections": [
+    {
+      "previewLimit": 50,
+      "server": "localhost",
+      "port": 5432,
+      "driver": "PostgreSQL",
+      "name": "TouristPacks",
+      "group": "Tourists",
+      "database": "turist_packs",
+      "username": "postgres",
+      "password": "postgres"
+    }
+  ],
+  "java.compile.nullAnalysis.mode": "automatic"
 }

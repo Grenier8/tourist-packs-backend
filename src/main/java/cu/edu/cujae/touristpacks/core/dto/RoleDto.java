@@ -1,42 +1,45 @@
 package cu.edu.cujae.touristpacks.core.dto;
 
 public class RoleDto {
-	private Long id;
+	private int idRole;
 	private String roleName;
-	private String description;
-
-	public RoleDto(Long id, String roleName, String description) {
-		this.id = id;
-		this.roleName = roleName;
-		this.description = description;
-	}
+	private String roleDescription;
 
 	public RoleDto() {
-		super();
-		// TODO Auto-generated constructor stub
 	}
 
-	public Long getId() {
-		return id;
+	public RoleDto(String roleName, String roleDescription) {
+		this.roleName = roleName;
+		this.roleDescription = roleDescription;
 	}
 
-	public void setId(Long id) {
-		this.id = id;
+	public RoleDto(int idRole, String roleName, String roleDescription) {
+		this(roleName, roleDescription);
+		this.idRole = idRole;
+	}
+
+	public int getIdRole() {
+		return this.idRole;
+	}
+
+	public void setIdRole(int idRole) {
+		this.idRole = idRole;
 	}
 
 	public String getRoleName() {
-		return roleName;
+		return this.roleName;
 	}
 
 	public void setRoleName(String roleName) {
 		this.roleName = roleName;
 	}
 
-	public String getDescription() {
-		return description;
+	public String getRoleDescription() {
+		return this.roleDescription;
 	}
 
-	public void setDescription(String description) {
-		this.description = description;
+	public void setRoleDescription(String roleDescription) {
+		this.roleDescription = roleDescription;
 	}
+
 }
