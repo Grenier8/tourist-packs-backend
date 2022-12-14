@@ -1,5 +1,6 @@
 package cu.edu.cujae.touristpacks.service;
 
+import java.sql.Connection;
 import java.sql.PreparedStatement;
 import java.sql.ResultSet;
 import java.sql.SQLException;
@@ -11,28 +12,120 @@ import org.springframework.jdbc.core.JdbcTemplate;
 import org.springframework.stereotype.Service;
 
 import cu.edu.cujae.touristpacks.core.dto.RoleDto;
-import cu.edu.cujae.touristpacks.core.service.RoleService;
+import cu.edu.cujae.touristpacks.core.service.IRoleService;
 
 @Service
-public class RoleServiceImpl implements RoleService {
+public class RoleServiceImpl implements IRoleService {
 
 	@Autowired
 	private JdbcTemplate jdbcTemplate;
 
 	@Override
-	public List<RoleDto> getRolesByUserId(String userId) throws SQLException {
-		List<RoleDto> roleList = new ArrayList<RoleDto>();
-		PreparedStatement pstmt = jdbcTemplate.getDataSource().getConnection().prepareStatement(
-				"SELECT id, role_name, description FROM xrole inner join user_role on user_role.role_id = xrole.id where user_role.user_id = ?");
+	public RoleDto getRoleById(int idRole) throws SQLException {
+		RoleDto role = null;
 
-		pstmt.setString(1, userId);
+		try (Connection connection = jdbcTemplate.getDataSource().getConnection()) {
+			PreparedStatement pstmt = connection.prepareStatement(
+					"SELECT * FROM role WHERE id_role = ?");
 
-		ResultSet rs = pstmt.executeQuery();
+			pstmt.setInt(1, idRole);
 
-		while (rs.next()) {
-			roleList.add(new RoleDto(rs.getLong("id"), rs.getString("role_name"), rs.getString("description")));
+			ResultSet rs = pstmt.executeQuery();
+
+			while (rs.next()) {
+				String roleName = rs.getString(2);
+				String roleDescription = rs.getString(3);
+
+				role = new RoleDto(idRole, roleName, roleDescription);
+			}
+
 		}
-		return roleList;
+		return role;
+	}
+
+	@Override
+	public RoleDto getRoleByName(String roleName) throws SQLException {
+		RoleDto role = null;
+
+		try (Connection connection = jdbcTemplate.getDataSource().getConnection()) {
+			PreparedStatement pstmt = connection.prepareStatement(
+					"SELECT * FROM role where role_name = ?");
+
+			pstmt.setString(1, roleName);
+
+			ResultSet resultSet = pstmt.executeQuery();
+
+			while (resultSet.next()) {
+				int idRole = resultSet.getInt(1);
+				String roleDescription = resultSet.getString(3);
+
+				role = new RoleDto(idRole, roleName, roleDescription);
+			}
+		}
+
+		return role;
+	}
+
+	@Override
+	public List<RoleDto> getRoles() throws SQLException {
+		List<RoleDto> list = new ArrayList<>();
+
+		try (Connection connection = jdbcTemplate.getDataSource().getConnection()) {
+			PreparedStatement pstmt = connection.prepareStatement(
+					"SELECT * FROM role");
+
+			ResultSet rs = pstmt.executeQuery();
+
+			while (rs.next()) {
+				int idRole = rs.getInt(1);
+				String roleName = rs.getString(2);
+				String roleDescription = rs.getString(3);
+
+				list.add(new RoleDto(idRole, roleName, roleDescription));
+			}
+
+		}
+		return list;
+	}
+
+	@Override
+	public void createRole(RoleDto role) throws SQLException {
+		String function = "INSERT INTO role (role_name, role_description) VALUES (?,?)";
+
+		try (Connection connection = jdbcTemplate.getDataSource().getConnection()) {
+			PreparedStatement statement = connection.prepareStatement(function);
+
+			statement.setString(1, role.getRoleName());
+			statement.setString(2, role.getRoleDescription());
+			statement.executeUpdate();
+		}
+
+	}
+
+	@Override
+	public void updateRole(RoleDto role) throws SQLException {
+		String function = "UPDATE role SET role_name = ?, role_description = ? WHERE id_role = ?; ";
+
+		try (Connection connection = jdbcTemplate.getDataSource().getConnection()) {
+			PreparedStatement statement = connection.prepareStatement(function);
+
+			statement.setString(1, role.getRoleName());
+			statement.setString(2, role.getRoleDescription());
+			statement.setInt(3, role.getIdRole());
+			statement.executeUpdate();
+		}
+	}
+
+	@Override
+	public void deleteRole(int idRole) throws SQLException {
+		String function = "DELETE FROM role WHERE id_role = ?; ";
+
+		try (Connection connection = jdbcTemplate.getDataSource().getConnection()) {
+			PreparedStatement statement = connection.prepareStatement(function);
+			statement.setInt(1, idRole);
+			statement.executeUpdate();
+		}
+
 	}
 
 }

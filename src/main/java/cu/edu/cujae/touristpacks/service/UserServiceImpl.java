@@ -3,6 +3,7 @@ package cu.edu.cujae.touristpacks.service;
 import java.security.MessageDigest;
 import java.security.NoSuchAlgorithmException;
 import java.sql.CallableStatement;
+import java.sql.Connection;
 import java.sql.PreparedStatement;
 import java.sql.ResultSet;
 import java.sql.SQLException;
@@ -17,87 +18,118 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.jdbc.core.JdbcTemplate;
 import org.springframework.stereotype.Service;
 
+import cu.edu.cujae.touristpacks.core.dto.RoleDto;
 import cu.edu.cujae.touristpacks.core.dto.UserDto;
-import cu.edu.cujae.touristpacks.core.service.RoleService;
-import cu.edu.cujae.touristpacks.core.service.UserService;
+import cu.edu.cujae.touristpacks.core.service.IRoleService;
+import cu.edu.cujae.touristpacks.core.service.IUserService;
 
 @Service
-public class UserServiceImpl implements UserService {
+public class UserServiceImpl implements IUserService {
 
 	@Autowired
 	private JdbcTemplate jdbcTemplate;
 
 	@Autowired
-	private RoleService roleService;
+	private IRoleService roleService;
 
 	@Override
 	public void createUser(UserDto user) throws SQLException {
-		CallableStatement CS = jdbcTemplate.getDataSource().getConnection().prepareCall(
-				"{call create_user(?, ?, ?, ?, ?, ?, ?)}");
+		String function = "INSERT INTO user_table(username, password, name, id_role, email) VALUES(?,?,?,?,?);";
 
-		CS.setString(1, UUID.randomUUID().toString().replaceAll("-", "").substring(0, 9));
-		CS.setString(2, user.getUsername());
-		CS.setString(3, user.getFullName());
-		CS.setString(4, getMd5Hash(user.getPassword()));
-		CS.setString(5, user.getEmail());
-		CS.setString(6, user.getIdentification());
+		try (Connection connection = jdbcTemplate.getDataSource().getConnection()) {
+			PreparedStatement statement = connection.prepareStatement(function);
 
-		// roles separados por coma, ej: "1, 2, 4"
-		String roles = user.getRoles().stream().map(r -> r.getId().toString()).collect(Collectors.joining(","));
-		CS.setString(7, roles);
-		CS.executeUpdate();
-
+			statement.setString(1, user.getUsername());
+			statement.setString(2, getMd5Hash(user.getPassword()));
+			statement.setString(3, user.getName());
+			statement.setInt(4, user.getRole().getIdRole());
+			statement.setString(5, user.getEmail());
+			statement.executeUpdate();
+		}
 	}
 
 	@Override
-	public List<UserDto> listUsers() throws SQLException {
-		List<UserDto> userList = new ArrayList<UserDto>();
-		ResultSet rs = jdbcTemplate.getDataSource().getConnection().createStatement().executeQuery(
-				"SELECT * FROM xuser");
+	public List<UserDto> getUsers() throws SQLException {
+		List<UserDto> userList = new ArrayList<>();
 
-		while (rs.next()) {
-			userList.add(new UserDto(rs.getString("id"), rs.getString("username"), rs.getString("full_name"),
-					rs.getString("password"), rs.getString("email"), rs.getString("identification"),
-					roleService.getRolesByUserId(rs.getString("id"))));
+		try (Connection connection = jdbcTemplate.getDataSource().getConnection()) {
+			PreparedStatement pstmt = connection.prepareStatement(
+					"SELECT * FROM user_table");
+
+			ResultSet rs = pstmt.executeQuery();
+
+			while (rs.next()) {
+				int idUser = rs.getInt(1);
+				String username = rs.getString(2);
+				String password = rs.getString(3);
+				String name = rs.getString(4);
+				int idRole = rs.getInt(5);
+				String email = rs.getString(6);
+
+				RoleDto role = roleService.getRoleById(idRole);
+
+				userList.add(new UserDto(idUser, username, password, name, role, email));
+			}
 		}
 		return userList;
 	}
 
 	@Override
-	public void updateUser(UserDto user) {
-		// TODO Auto-generated method stub
+	public void updateUser(UserDto user) throws SQLException {
+		String function = "UPDATE user_table SET username = ?, password = ?, name = ?, id_role = ?, email = ? WHERE id_user = ?;";
+
+		try (Connection connection = jdbcTemplate.getDataSource().getConnection()) {
+			PreparedStatement statement = connection.prepareStatement(function);
+
+			statement.setString(1, user.getUsername());
+			statement.setString(2, getMd5Hash(user.getPassword()));
+			statement.setString(3, user.getName());
+			statement.setInt(4, user.getRole().getIdRole());
+			statement.setString(5, user.getEmail());
+			statement.setInt(6, user.getIdUser());
+			statement.executeUpdate();
+		}
 
 	}
 
 	@Override
-	public UserDto getUserById(String userId) throws SQLException {
-
+	public UserDto getUserById(int idUser) throws SQLException {
 		UserDto user = null;
 
-		PreparedStatement pstmt = jdbcTemplate.getDataSource().getConnection().prepareStatement(
-				"SELECT * FROM xuser where id = ?");
+		try (Connection connection = jdbcTemplate.getDataSource().getConnection()) {
 
-		pstmt.setString(1, userId);
+			PreparedStatement pstmt = connection.prepareStatement(
+					"SELECT * FROM user_table WHERE id_user = ?");
 
-		ResultSet rs = pstmt.executeQuery();
+			pstmt.setInt(1, idUser);
 
-		while (rs.next()) {
-			user = new UserDto(rs.getString("id"), rs.getString("username"), rs.getString("full_name"),
-					rs.getString("password"), rs.getString("email"), rs.getString("identification"),
-					roleService.getRolesByUserId(rs.getString("id")));
+			ResultSet resultSet = pstmt.executeQuery();
+
+			while (resultSet.next()) {
+				String username = resultSet.getString(2);
+				String password = resultSet.getString(3);
+				String name = resultSet.getString(4);
+				int idRole = resultSet.getInt(5);
+				String email = resultSet.getString(6);
+
+				RoleDto role = roleService.getRoleById(idRole);
+
+				user = new UserDto(idUser, username, password, name, role, email);
+			}
 		}
-
 		return user;
 	}
 
 	@Override
-	public void deleteUser(String userId) throws SQLException {
+	public void deleteUser(int userId) throws SQLException {
 
-		CallableStatement CS = jdbcTemplate.getDataSource().getConnection().prepareCall(
-				"{call delete_user(?)}");
+		try (Connection connection = jdbcTemplate.getDataSource().getConnection()) {
+			PreparedStatement pstmt = connection.prepareStatement(
+					"DELETE FROM user_table WHERE id_user = ?");
 
-		CS.setString(1, userId);
-		CS.executeUpdate();
+			pstmt.setInt(1, userId);
+			pstmt.executeUpdate();
+		}
 	}
 
 	private String getMd5Hash(String password) {
@@ -110,7 +142,6 @@ public class UserServiceImpl implements UserService {
 			md5Hash = DatatypeConverter
 					.printHexBinary(digest).toUpperCase();
 		} catch (NoSuchAlgorithmException e) {
-			// TODO Auto-generated catch block
 			e.printStackTrace();
 		}
 		return md5Hash;
