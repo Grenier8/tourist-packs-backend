@@ -9,6 +9,10 @@ public class UserAuthenticatedDto {
     private String email;
     private String token;
 
+    public UserAuthenticatedDto() {
+
+    }
+
     public UserAuthenticatedDto(String username, String password, String name, RoleDto role, String email,
             String token) {
         this.username = username;
