@@ -163,9 +163,6 @@ public class UserServiceImpl implements IUserService {
 			int idRole = resultSet.getInt(5);
 			String email = resultSet.getString(6);
 
-			String as = encodePass("3333");
-			System.out.println(as);
-
 			RoleDto role = roleService.getRoleById(idRole);
 
 			user = new UserDto(idUser, username, password, name, role, email);
