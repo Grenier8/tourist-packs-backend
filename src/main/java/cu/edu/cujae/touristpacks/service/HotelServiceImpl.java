@@ -259,4 +259,46 @@ public class HotelServiceImpl implements IHotelService {
 
     }
 
+    @Override
+    public List<HotelDto> getHotelsByModality(String modalityName) throws SQLException {
+        List<HotelDto> list = new ArrayList<>();
+
+        String function = "SELECT * FROM hotel, hotel_modality, hotel_hotel_modality WHERE hotel_modality.hotel_modality_name = ? AND hotel_modality.id_hotel_modality = hotel_hotel_modality.id_hotel_modality AND hotel.id_hotel = hotel_hotel_modality.id_hotel;";
+
+        try (Connection connection = jdbcTemplate.getDataSource().getConnection()) {
+            PreparedStatement pstmt = connection.prepareStatement(function);
+
+            pstmt.setString(1, modalityName);
+
+            ResultSet resultSet = pstmt.executeQuery();
+
+            while (resultSet.next()) {
+                int idHotel = resultSet.getInt(1);
+                String hotelName = resultSet.getString(2);
+                String address = resultSet.getString(3);
+                String telephoneNumber = resultSet.getString(4);
+                int category = resultSet.getInt(5);
+                String fax = resultSet.getString(6);
+                String email = resultSet.getString(7);
+                double distanceToAirport = resultSet.getDouble(8);
+                double distanceToNearestCity = resultSet.getDouble(9);
+                int roomsAmount = resultSet.getInt(10);
+                int levelsAmount = resultSet.getInt(11);
+                String localization = resultSet.getString(12);
+                int idChain = resultSet.getInt(13);
+                int idProvince = resultSet.getInt(14);
+
+                HotelChainDto hotelChain = hotelChainService.getHotelChainById(idChain);
+                ProvinceDto province = provinceService.getProvinceById(idProvince);
+
+                HotelDto dto = new HotelDto(idHotel, hotelName, address, category, telephoneNumber, fax, email,
+                        distanceToNearestCity, distanceToAirport, roomsAmount, levelsAmount, localization, hotelChain,
+                        province, new ArrayList<>());
+                list.add(dto);
+            }
+        }
+
+        return list;
+    }
+
 }

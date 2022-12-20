@@ -91,7 +91,7 @@ public class TransportContractTransportServiceServiceImpl implements ITransportC
         String function = "{call transport_contract_transport_service_insert(?,?)}";
 
         try (CallableStatement statement = jdbcTemplate.getDataSource().getConnection().prepareCall(function)) {
-            statement.setInt(1, transportContractTransportService.getTransportContract().getIdContract());
+            statement.setInt(1, transportContractTransportService.getTransportContract().getIdTransportContract());
             statement.setInt(2, transportContractTransportService.getTransportService().getIdTransportService());
             statement.execute();
         }
@@ -104,7 +104,7 @@ public class TransportContractTransportServiceServiceImpl implements ITransportC
 
         try (CallableStatement statement = jdbcTemplate.getDataSource().getConnection().prepareCall(function)) {
             statement.setInt(1, transportContractTransportService.getIdTransportContractTransportService());
-            statement.setInt(2, transportContractTransportService.getTransportContract().getIdContract());
+            statement.setInt(2, transportContractTransportService.getTransportContract().getIdTransportContract());
             statement.setInt(3, transportContractTransportService.getTransportService().getIdTransportService());
             statement.execute();
         }

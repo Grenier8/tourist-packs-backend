@@ -20,43 +20,43 @@ import cu.edu.cujae.touristpacks.core.service.ITransportServiceService;
 @RestController
 @RequestMapping("/api/v1/transport_services")
 public class TransportServiceController {
-	
-	    @Autowired
-	    private ITransportServiceService transportServiceService;
 
-	    @GetMapping("/")
-	    public ResponseEntity<List<TransportServiceDto>> getAll() throws SQLException {
-	        List<TransportServiceDto> list = transportServiceService.getTransportServices();
-	        return ResponseEntity.ok(list);
-	    }
+	@Autowired
+	private ITransportServiceService transportServiceService;
 
-	    @GetMapping("/{id}")
-	    public ResponseEntity<TransportServiceDto> getById(@PathVariable Integer id) throws SQLException {
-	        TransportServiceDto transportService = transportServiceService.getTransportServiceById(id);
-	        return ResponseEntity.ok(transportService);
-	    }
+	@GetMapping("/")
+	public ResponseEntity<List<TransportServiceDto>> getAll() throws SQLException {
+		List<TransportServiceDto> list = transportServiceService.getTransportServices();
+		return ResponseEntity.ok(list);
+	}
 
-	    @GetMapping("/name/{name}")
-	    public ResponseEntity<TransportServiceDto> getByTitle(@PathVariable String name) throws SQLException {
-	    	TransportServiceDto transportService = transportServiceService.getTransportServiceByName(name);
-	        return ResponseEntity.ok(transportService);
-	    }
-	    
-	    @PostMapping("/")
-	    public ResponseEntity<String> create(@RequestBody TransportServiceDto transportService) throws SQLException {
-	        transportServiceService.createTransportService(transportService);
-	        return ResponseEntity.ok("TransportService Created");
-	    }
+	@GetMapping("/{id}")
+	public ResponseEntity<TransportServiceDto> getById(@PathVariable Integer id) throws SQLException {
+		TransportServiceDto transportService = transportServiceService.getTransportServiceById(id);
+		return ResponseEntity.ok(transportService);
+	}
 
-	    @PutMapping("/")
-	    public ResponseEntity<String> update(@RequestBody TransportServiceDto transportService) throws SQLException {
-	        transportServiceService.updateTransportService(transportService);
-	        return ResponseEntity.ok("TransportService Updated");
-	    }
+	@GetMapping("/name/{name}")
+	public ResponseEntity<TransportServiceDto> getByName(@PathVariable String name) throws SQLException {
+		TransportServiceDto transportService = transportServiceService.getTransportServiceByName(name);
+		return ResponseEntity.ok(transportService);
+	}
 
-	    @DeleteMapping("/{id}")
-	    public ResponseEntity<String> delete(@PathVariable Integer id) throws SQLException {
-	        transportServiceService.deleteTransportService(id);
-	        return ResponseEntity.ok("TransportService deleted");
-	    }
+	@PostMapping("/")
+	public ResponseEntity<String> create(@RequestBody TransportServiceDto transportService) throws SQLException {
+		transportServiceService.createTransportService(transportService);
+		return ResponseEntity.ok("TransportService Created");
+	}
+
+	@PutMapping("/")
+	public ResponseEntity<String> update(@RequestBody TransportServiceDto transportService) throws SQLException {
+		transportServiceService.updateTransportService(transportService);
+		return ResponseEntity.ok("TransportService Updated");
+	}
+
+	@DeleteMapping("/{id}")
+	public ResponseEntity<String> delete(@PathVariable Integer id) throws SQLException {
+		transportServiceService.deleteTransportService(id);
+		return ResponseEntity.ok("TransportService deleted");
+	}
 }
