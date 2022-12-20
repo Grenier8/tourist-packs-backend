@@ -51,8 +51,8 @@ public class ProviderServiceImpl implements IProviderService {
     public ProviderDto getProviderById(int providerId) throws SQLException {
         ProviderDto provider = null;
 
-        try (PreparedStatement pstmt = jdbcTemplate.getDataSource().getConnection().prepareStatement(
-                "SELECT * FROM provider where id_provider = ?")) {
+        try (Connection connection = jdbcTemplate.getDataSource().getConnection()){
+        	PreparedStatement pstmt = connection.prepareStatement("SELECT * FROM provider where id_provider = ?");
 
             pstmt.setInt(1, providerId);
 
@@ -71,8 +71,9 @@ public class ProviderServiceImpl implements IProviderService {
     public ProviderDto getProviderByName(String providerName) throws SQLException {
         ProviderDto provider = null;
 
-        try (PreparedStatement pstmt = jdbcTemplate.getDataSource().getConnection().prepareStatement(
-                "SELECT * FROM provider where provider_name = ?")) {
+        try (Connection connection = jdbcTemplate.getDataSource().getConnection()){
+        	PreparedStatement pstmt = connection.prepareStatement(
+        			"SELECT * FROM provider where provider_name = ?");
 
             pstmt.setString(1, providerName);
 

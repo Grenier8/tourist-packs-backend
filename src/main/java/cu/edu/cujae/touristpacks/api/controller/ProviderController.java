@@ -21,7 +21,7 @@ import cu.edu.cujae.touristpacks.core.service.IProviderService;
 @RequestMapping("/api/v1/providers")
 public class ProviderController {
 
-	@Autowired
+    @Autowired
     private IProviderService providerService;
 
     @GetMapping("/")
@@ -33,6 +33,12 @@ public class ProviderController {
     @GetMapping("/{id}")
     public ResponseEntity<ProviderDto> getById(@PathVariable Integer id) throws SQLException {
         ProviderDto provider = providerService.getProviderById(id);
+        return ResponseEntity.ok(provider);
+    }
+
+    @GetMapping("/name/{name}")
+    public ResponseEntity<ProviderDto> getByName(@PathVariable String name) throws SQLException {
+        ProviderDto provider = providerService.getProviderByName(name);
         return ResponseEntity.ok(provider);
     }
 

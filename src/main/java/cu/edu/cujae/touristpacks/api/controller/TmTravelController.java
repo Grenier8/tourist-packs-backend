@@ -36,6 +36,12 @@ public class TmTravelController {
         return ResponseEntity.ok(tmTravel);
     }
 
+    @GetMapping("/name/{name}")
+    public ResponseEntity<TmTravelDto> getByName(@PathVariable String name) throws SQLException {
+    	TmTravelDto tmTravel = tmTravelService.getTmTravelByName(name);
+        return ResponseEntity.ok(tmTravel);
+    }
+    
     @PostMapping("/")
     public ResponseEntity<String> create(@RequestBody TmTravelDto tmTravel) throws SQLException {
         tmTravelService.createTmTravel(tmTravel);

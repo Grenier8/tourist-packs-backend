@@ -14,23 +14,21 @@ public class TmHourKmDto extends TransportModalityDto {
 
 	public TmHourKmDto(String tmodalityName, double costPerTravelledKm, double costPerHour, double costPerExtraKm,
 			double costPerExtraHour, int idTModality) {
-		super(tmodalityName);
+		super(idTModality, tmodalityName);
 		this.costPerTravelledKm = costPerTravelledKm;
 		this.costPerHour = costPerHour;
 		this.costPerExtraKm = costPerExtraKm;
 		this.costPerExtraHour = costPerExtraHour;
-		this.idTransportModality = idTModality;
 	}
 
 	public TmHourKmDto(int idTmHourKm, String tmodalityName, double costPerTravelledKm, double costPerHour,
 			double costPerExtraKm, double costPerExtraHour, int idTModality) {
-		super(tmodalityName);
+		super(idTModality, tmodalityName);
 		this.idTmHourKm = idTmHourKm;
 		this.costPerTravelledKm = costPerTravelledKm;
 		this.costPerHour = costPerHour;
 		this.costPerExtraKm = costPerExtraKm;
 		this.costPerExtraHour = costPerExtraHour;
-		this.idTransportModality = idTModality;
 	}
 
 	public TmHourKmDto(String tmodalityName, double costPerTravelledKm, double costPerHour, double costPerExtraKm,

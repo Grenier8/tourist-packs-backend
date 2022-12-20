@@ -92,8 +92,9 @@ public class TmTravelServiceImpl implements ITmTravelService {
         TransportModalityDto tmodality = tmodalityService.getTransportModalityByName(tmTravelName);
         int id_tmodality = tmodality.getIdTransportModality();
 
-        try (PreparedStatement pstmt = jdbcTemplate.getDataSource().getConnection().prepareStatement(
-                "SELECT * FROM tm_travel where id_tmodality_travel = ?")) {
+        try (Connection connection = jdbcTemplate.getDataSource().getConnection()){
+        	PreparedStatement pstmt = connection.prepareStatement(
+        			"SELECT * FROM tm_travel WHERE id_tmodality = ?");
 
             pstmt.setInt(1, id_tmodality);
 
@@ -120,7 +121,7 @@ public class TmTravelServiceImpl implements ITmTravelService {
             statement.setString(1, tmTravel.getTravelDescription());
             statement.setDouble(2, tmTravel.getCostTravel());
             statement.setDouble(3, tmTravel.getCostTravelGoAndBack());
-            statement.setInt(4, tmTravel.getIdTransportModality());
+            statement.setInt(4, tmodalityService.getTransportModalityByName(tmTravel.getTransportModalityName()).getIdTransportModality());
             statement.execute();
         }
     }

@@ -1,34 +1,29 @@
 package cu.edu.cujae.touristpacks.core.dto;
 
 import java.time.LocalDate;
+import java.util.List;
 
 public class TransportContractDto extends ContractDto {
 
 	private int idTransportContract;
 	private ProviderDto provider;
+	private List<TransportServiceDto> transportServices;
 
 	public TransportContractDto() {
-		super();
 	}
 
-	public TransportContractDto(String contractTitle, LocalDate startDate, LocalDate endDate,
-			LocalDate conciliationDate, ProviderDto provider) {
-		super(contractTitle, startDate, endDate, conciliationDate);
+	public TransportContractDto(int idContract, String contractTitle, LocalDate startDate, LocalDate endDate,
+			LocalDate conciliationDate, ProviderDto provider, List<TransportServiceDto> transportServices) {
+		super(idContract, contractTitle, startDate, endDate, conciliationDate);
 		this.provider = provider;
-	}
-
-	public TransportContractDto(int idTransportContract, String contractTitle, LocalDate startDate, LocalDate endDate,
-			LocalDate conciliationDate, ProviderDto provider) {
-		this(contractTitle, startDate, endDate, conciliationDate, provider);
-		this.idTransportContract = idTransportContract;
+		this.transportServices = transportServices;
 	}
 
 	public TransportContractDto(int idTransportContract, int idContract, String contractTitle, LocalDate startDate,
 			LocalDate endDate,
-			LocalDate conciliationDate, ProviderDto provider) {
-		super(idContract, contractTitle, startDate, endDate, conciliationDate);
+			LocalDate conciliationDate, ProviderDto provider, List<TransportServiceDto> transportServices) {
+		this(idContract, contractTitle, startDate, endDate, conciliationDate, provider, transportServices);
 		this.idTransportContract = idTransportContract;
-		this.provider = provider;
 	}
 
 	public int getIdTransportContract() {
@@ -45,6 +40,14 @@ public class TransportContractDto extends ContractDto {
 
 	public void setProvider(ProviderDto provider) {
 		this.provider = provider;
+	}
+
+	public List<TransportServiceDto> getTransportServices() {
+		return this.transportServices;
+	}
+
+	public void setTransportServices(List<TransportServiceDto> transportServices) {
+		this.transportServices = transportServices;
 	}
 
 }

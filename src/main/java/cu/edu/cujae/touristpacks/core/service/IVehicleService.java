@@ -15,4 +15,6 @@ public interface IVehicleService {
     void updateVehicle(VehicleDto vehicle) throws SQLException;
 
     void deleteVehicle(int id) throws SQLException;
+
+	VehicleDto getVehicleByPlate(String vehiclePlate) throws SQLException;
 }
