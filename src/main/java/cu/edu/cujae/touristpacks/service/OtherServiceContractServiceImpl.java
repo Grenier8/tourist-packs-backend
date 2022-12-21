@@ -271,4 +271,49 @@ public class OtherServiceContractServiceImpl implements IOtherServiceContractSer
         contractService.deleteContract(idContract);
     }
 
+    @Override
+    public List<OtherServiceContractDto> getOtherServiceContractsByYearAndMonth(int month, int year)
+            throws SQLException {
+        List<OtherServiceContractDto> list = new ArrayList<>();
+
+        try (Connection connection = jdbcTemplate.getDataSource().getConnection()) {
+            PreparedStatement pstmt = connection.prepareStatement(
+                    "SELECT * FROM other_service_contract, other_service_contract_diary_activity, diary_activity WHERE extract(month from diary_activity.date) = ? AND extract(year from diary_activity.date) = ? AND diary_activity.id_activity = other_service_contract_diary_activity.id_activity AND other_service_contract_diary_activity.id_other_service_contract = other_service_contract.id_other_service_contract;");
+
+            pstmt.setInt(1, month);
+            pstmt.setInt(2, year);
+
+            ResultSet resultSet = pstmt.executeQuery();
+
+            while (resultSet.next()) {
+                int idOtherServiceContract = resultSet.getInt(1);
+                String contractDescription = resultSet.getString(2);
+                double costPerPax = resultSet.getDouble(3);
+                int idServiceType = resultSet.getInt(4);
+                int idProvince = resultSet.getInt(5);
+                int idContract = resultSet.getInt(6);
+
+                ContractDto contract = contractService.getContractById(idContract);
+
+                String contractTitle = contract.getContractTitle();
+                LocalDate startDate = contract.getStartDate();
+                LocalDate endDate = contract.getEndDate();
+                LocalDate conciliationDate = contract.getConciliationDate();
+                int contractYear = conciliationDate.getYear();
+
+                ServiceTypeDto serviceType = serviceTypeService.getServiceTypeById(idServiceType);
+                ProvinceDto province = provinceService.getProvinceById(idProvince);
+                List<DiaryActivityDto> diaryActivities = otherServiceContractDiaryActivityService
+                        .getDiaryActivitiesByIdOtherServiceContract(idOtherServiceContract);
+
+                list.add(new OtherServiceContractDto(idOtherServiceContract, idContract,
+                        contractTitle,
+                        startDate, endDate, conciliationDate, contractDescription, costPerPax, serviceType, province,
+                        diaryActivities));
+            }
+        }
+
+        return list;
+    }
+
 }

@@ -73,8 +73,9 @@ public class TransportModalityServiceImpl implements ITransportModalityService {
     public TransportModalityDto getTransportModalityByName(String transportModalityName) throws SQLException {
         TransportModalityDto tmodality = null;
 
-        try (PreparedStatement pstmt = jdbcTemplate.getDataSource().getConnection().prepareStatement(
-                "SELECT * FROM transp_modality where tmodality_name = ?")) {
+        try (Connection connection = jdbcTemplate.getDataSource().getConnection()){
+        	PreparedStatement pstmt = connection.prepareStatement(
+        			"SELECT * FROM transp_modality where tmodality_name = ?");
 
             pstmt.setString(1, transportModalityName);
 

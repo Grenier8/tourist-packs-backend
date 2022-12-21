@@ -95,10 +95,12 @@ public class TmHourKmServiceImpl implements ITmHourKmService {
         TransportModalityDto tmodality = tmodalityService.getTransportModalityByName(tmHourKmName);
         int id_tmodality = tmodality.getIdTransportModality();
 
-        try (PreparedStatement pstmt = jdbcTemplate.getDataSource().getConnection().prepareStatement(
-                "SELECT * FROM tm_hour_km where id_tmodality_hour_km = ?")) {
+        try (Connection connection = jdbcTemplate.getDataSource().getConnection()){
+        	PreparedStatement pstmt = connection.prepareStatement(
+        			"SELECT * FROM tm_hour_km WHERE id_tmodality = ?");
 
             pstmt.setInt(1, id_tmodality);
+            
             ResultSet resultSet = pstmt.executeQuery();
 
             while (resultSet.next()) {
@@ -118,13 +120,13 @@ public class TmHourKmServiceImpl implements ITmHourKmService {
     @Override
     public void createTmHourKm(TmHourKmDto tmHourKm) throws SQLException {
         String function = "{call tm_hour_km_insert(?,?,?,?,?)}";
-
+        
         try (CallableStatement statement = jdbcTemplate.getDataSource().getConnection().prepareCall(function)) {
             statement.setDouble(1, tmHourKm.getCostPerTravelledKm());
             statement.setDouble(2, tmHourKm.getCostPerHour());
             statement.setDouble(3, tmHourKm.getCostPerExtraKm());
             statement.setDouble(4, tmHourKm.getCostPerExtraHour());
-            statement.setInt(5, tmHourKm.getIdTransportModality());
+            statement.setInt(5, tmodalityService.getTransportModalityByName(tmHourKm.getTransportModalityName()).getIdTransportModality());
             statement.execute();
         }
     }

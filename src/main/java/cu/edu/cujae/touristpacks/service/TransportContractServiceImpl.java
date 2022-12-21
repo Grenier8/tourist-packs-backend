@@ -13,9 +13,12 @@ import java.util.List;
 import cu.edu.cujae.touristpacks.core.dto.ContractDto;
 import cu.edu.cujae.touristpacks.core.dto.ProviderDto;
 import cu.edu.cujae.touristpacks.core.dto.TransportContractDto;
+import cu.edu.cujae.touristpacks.core.dto.TransportContractTransportServiceDto;
+import cu.edu.cujae.touristpacks.core.dto.TransportServiceDto;
 import cu.edu.cujae.touristpacks.core.service.IContractService;
 import cu.edu.cujae.touristpacks.core.service.IProviderService;
 import cu.edu.cujae.touristpacks.core.service.ITransportContractService;
+import cu.edu.cujae.touristpacks.core.service.ITransportContractTransportServiceService;
 
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.jdbc.core.JdbcTemplate;
@@ -33,6 +36,9 @@ public class TransportContractServiceImpl implements ITransportContractService {
     @Autowired
     private IProviderService providerService;
 
+    @Autowired
+    private ITransportContractTransportServiceService transportContractTransportServiceService;
+
     @Override
     public List<TransportContractDto> getTransportContracts() throws SQLException {
         List<TransportContractDto> list = new ArrayList<>();
@@ -48,13 +54,16 @@ public class TransportContractServiceImpl implements ITransportContractService {
             ResultSet resultSet = (ResultSet) statement.getObject(1);
 
             while (resultSet.next()) {
-                int id_transport_contract = resultSet.getInt(1);
+                int idTransportContract = resultSet.getInt(1);
                 ProviderDto provider = providerService.getProviderById(resultSet.getInt(2));
                 ContractDto contract = contractService.getContractById(resultSet.getInt(3));
+                List<TransportServiceDto> transportServices = transportContractTransportServiceService
+                        .getTransportServicesByIdTransportContract(idTransportContract);
 
-                TransportContractDto transportContract = new TransportContractDto(id_transport_contract,
+                TransportContractDto transportContract = new TransportContractDto(idTransportContract,
                         contract.getIdContract(), contract.getContractTitle(),
-                        contract.getStartDate(), contract.getEndDate(), contract.getConciliationDate(), provider);
+                        contract.getStartDate(), contract.getEndDate(), contract.getConciliationDate(), provider,
+                        transportServices);
                 list.add(transportContract);
             }
         }
@@ -62,49 +71,59 @@ public class TransportContractServiceImpl implements ITransportContractService {
     }
 
     @Override
-    public TransportContractDto getTransportContractById(int transportContractId) throws SQLException {
+    public TransportContractDto getTransportContractById(int idTransportContract) throws SQLException {
         TransportContractDto transportContract = null;
 
-        PreparedStatement pstmt = jdbcTemplate.getDataSource().getConnection().prepareStatement(
-                "SELECT * FROM transport_contract where id_transport_contract = ?");
+        try (Connection connection = jdbcTemplate.getDataSource().getConnection()) {
+            PreparedStatement pstmt = connection.prepareStatement(
+                    "SELECT * FROM transport_contract where id_transport_contract = ?");
 
-        pstmt.setInt(1, transportContractId);
+            pstmt.setInt(1, idTransportContract);
 
-        ResultSet resultSet = pstmt.executeQuery();
+            ResultSet resultSet = pstmt.executeQuery();
 
-        while (resultSet.next()) {
-            ProviderDto provider = providerService.getProviderById(resultSet.getInt(2));
-            ContractDto contract = contractService.getContractById(resultSet.getInt(3));
+            while (resultSet.next()) {
+                ProviderDto provider = providerService.getProviderById(resultSet.getInt(2));
+                ContractDto contract = contractService.getContractById(resultSet.getInt(3));
+                List<TransportServiceDto> transportServices = transportContractTransportServiceService
+                        .getTransportServicesByIdTransportContract(idTransportContract);
 
-            transportContract = new TransportContractDto(transportContractId,
-                    contract.getIdContract(), contract.getContractTitle(),
-                    contract.getStartDate(), contract.getEndDate(), contract.getConciliationDate(), provider);
-
+                transportContract = new TransportContractDto(idTransportContract,
+                        contract.getIdContract(), contract.getContractTitle(),
+                        contract.getStartDate(), contract.getEndDate(), contract.getConciliationDate(), provider,
+                        transportServices);
+            }
         }
 
         return transportContract;
     }
 
     @Override
-    public TransportContractDto getTransportContractByTitle(String transportContractTitle) throws SQLException {
+    public TransportContractDto getTransportContractByTitle(String contractTitle) throws SQLException {
         TransportContractDto transportContract = null;
-        ContractDto contract = contractService.getContractByTitle(transportContractTitle);
-        int id_contratc = contract.getIdContract();
 
-        PreparedStatement pstmt = jdbcTemplate.getDataSource().getConnection().prepareStatement(
-                "SELECT * FROM transport_contract where id_transport_contract = ?");
+        ContractDto contract = contractService.getContractByTitle(contractTitle);
+        int idContract = contract.getIdContract();
 
-        pstmt.setInt(1, id_contratc);
+        try (Connection connection = jdbcTemplate.getDataSource().getConnection()) {
+            PreparedStatement pstmt = connection.prepareStatement(
+                    "SELECT * FROM transport_contract where id_contract = ?");
 
-        ResultSet resultSet = pstmt.executeQuery();
+            pstmt.setInt(1, idContract);
+            ResultSet resultSet = pstmt.executeQuery();
 
-        while (resultSet.next()) {
-            int id_transport_contract = resultSet.getInt(1);
-            ProviderDto provider = providerService.getProviderById(resultSet.getInt(2));
+            while (resultSet.next()) {
+                int idTransportContract = resultSet.getInt(1);
+                ProviderDto provider = providerService.getProviderById(resultSet.getInt(2));
+                List<TransportServiceDto> transportServices = transportContractTransportServiceService
+                        .getTransportServicesByIdTransportContract(idTransportContract);
 
-            transportContract = new TransportContractDto(id_transport_contract,
-                    contract.getIdContract(), contract.getContractTitle(),
-                    contract.getStartDate(), contract.getEndDate(), contract.getConciliationDate(), provider);
+                transportContract = new TransportContractDto(idTransportContract,
+                        contract.getIdContract(), contract.getContractTitle(),
+                        contract.getStartDate(), contract.getEndDate(), contract.getConciliationDate(), provider,
+                        transportServices);
+
+            }
         }
 
         return transportContract;
@@ -112,17 +131,35 @@ public class TransportContractServiceImpl implements ITransportContractService {
 
     @Override
     public void createTransportContract(TransportContractDto transportContract) throws SQLException {
+        contractService.createContract(transportContract);
+        int idContract = contractService.getContractByTitle(transportContract.getContractTitle()).getIdContract();
+
         String function = "{call transport_contract_insert(?,?)}";
 
         try (CallableStatement statement = jdbcTemplate.getDataSource().getConnection().prepareCall(function)) {
             statement.setInt(1, transportContract.getProvider().getIdProvider());
-            statement.setInt(2, transportContract.getIdContract());
+            statement.setInt(2, idContract);
             statement.execute();
         }
+
+        TransportContractDto insertedTransportContract = getTransportContractByTitle(
+                transportContract.getContractTitle());
+
+        for (TransportServiceDto transportService : transportContract.getTransportServices()) {
+            TransportContractTransportServiceDto transportContractTransportService = new TransportContractTransportServiceDto(
+                    insertedTransportContract, transportService);
+            transportContractTransportServiceService
+                    .createTransportContractTransportService(transportContractTransportService);
+        }
+
     }
 
     @Override
     public void updateTransportContract(TransportContractDto transportContract) throws SQLException {
+        transportContract
+                .setIdContract(getTransportContractById(transportContract.getIdTransportContract()).getIdContract());
+        contractService.updateContract(transportContract);
+
         String function = "{call transport_contract_update(?,?,?)}";
 
         try (CallableStatement statement = jdbcTemplate.getDataSource().getConnection().prepareCall(function)) {
@@ -131,16 +168,50 @@ public class TransportContractServiceImpl implements ITransportContractService {
             statement.setInt(3, transportContract.getIdContract());
             statement.execute();
         }
+
+        List<TransportServiceDto> formerTransportServices = transportContractTransportServiceService
+                .getTransportServicesByIdTransportContract(transportContract.getIdTransportContract());
+        List<TransportServiceDto> newTransportServices = transportContract.getTransportServices();
+
+        for (TransportServiceDto formerTransportService : formerTransportServices) {
+            boolean deleted = true;
+            for (TransportServiceDto newTransportService : newTransportServices) {
+                if (formerTransportService.getIdTransportService() == newTransportService
+                        .getIdTransportService()) {
+                    deleted = false;
+                    newTransportServices.remove(newTransportService);
+                    break;
+                }
+            }
+            if (deleted) {
+                transportContractTransportServiceService.deleteTransportContractTransportServiceByIds(
+                        transportContract.getIdTransportContract(),
+                        formerTransportService.getIdTransportService());
+            }
+        }
+
+        for (TransportServiceDto newTransportService : newTransportServices) {
+            transportContractTransportServiceService
+                    .createTransportContractTransportService(
+                            new TransportContractTransportServiceDto(transportContract, newTransportService));
+        }
     }
 
     @Override
     public void deleteTransportContract(int idTransportContract) throws SQLException {
+        transportContractTransportServiceService
+                .deleteTransportContractTransportServiceByIdTransportContract(idTransportContract);
+
+        int idContract = getTransportContractById(idTransportContract).getIdContract();
+
         String function = "{call transport_contract_delete(?)}";
 
         try (CallableStatement statement = jdbcTemplate.getDataSource().getConnection().prepareCall(function)) {
             statement.setInt(1, idTransportContract);
             statement.execute();
         }
+
+        contractService.deleteContract(idContract);
     }
 
 }

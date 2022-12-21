@@ -80,6 +80,33 @@ public class VehicleServiceImpl implements IVehicleService {
 		return vehicle;
 	}
 
+	   @Override
+	   public VehicleDto getVehicleByPlate(String vehiclePlate) throws SQLException {
+	       VehicleDto vehicle = null;
+    	        
+	       try (Connection connection = jdbcTemplate.getDataSource().getConnection()){
+	        	PreparedStatement pstmt = connection.prepareStatement(
+	        			"SELECT * FROM vehicle WHERE plate = ?");
+
+	            pstmt.setString(1, vehiclePlate);
+	            ResultSet resultSet = pstmt.executeQuery();
+	            
+	            while (resultSet.next()) {
+					int idVehicle = resultSet.getInt(1);
+					String brand = resultSet.getString(3);
+					int noBaggageCapacity = resultSet.getInt(4);
+					int baggageCapacity = resultSet.getInt(5);
+					int totalCapacity = resultSet.getInt(6);
+					int fabricationYear = resultSet.getInt(7);
+
+					vehicle = new VehicleDto(idVehicle, vehiclePlate, brand, noBaggageCapacity,
+							baggageCapacity, totalCapacity, fabricationYear);
+	            }
+	        }
+
+	        return vehicle;
+	    }
+	
 	@Override
 	public void createVehicle(VehicleDto vehicle) throws SQLException {
 		String function = "{call vehicle_insert(?,?,?,?,?,?)}";

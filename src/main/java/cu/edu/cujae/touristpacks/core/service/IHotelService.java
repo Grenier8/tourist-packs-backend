@@ -17,4 +17,6 @@ public interface IHotelService {
     void updateHotel(HotelDto hotel) throws SQLException;
 
     void deleteHotel(int id) throws SQLException;
+
+    List<HotelDto> getHotelsByModality(String modalityName) throws SQLException;
 }

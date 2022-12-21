@@ -17,4 +17,6 @@ public interface IOtherServiceContractService {
     void updateOtherServiceContract(OtherServiceContractDto otherServiceContract) throws SQLException;
 
     void deleteOtherServiceContract(int idOtherServiceContract) throws SQLException;
+
+    List<OtherServiceContractDto> getOtherServiceContractsByYearAndMonth(int month, int year) throws SQLException;
 }

@@ -88,16 +88,17 @@ public class TmKmServiceImpl implements ITmKmService {
     @Override
     public TmKmDto getTmKmByName(String tmKmName) throws SQLException {
         TmKmDto tmKm = null;
+        
         TransportModalityDto tmodality = tmodalityService.getTransportModalityByName(tmKmName);
         int id_tmodality = tmodality.getIdTransportModality();
-
-        try (PreparedStatement pstmt = jdbcTemplate.getDataSource().getConnection().prepareStatement(
-                "SELECT * FROM tm_km where id_tmodality_km = ?")) {
+        
+        try (Connection connection = jdbcTemplate.getDataSource().getConnection()){
+        	PreparedStatement pstmt = connection.prepareStatement(
+        			"SELECT * FROM tm_km WHERE id_tmodality = ?");
 
             pstmt.setInt(1, id_tmodality);
-
             ResultSet resultSet = pstmt.executeQuery();
-
+            
             while (resultSet.next()) {
                 int id_tmodality_km = resultSet.getInt(1);
                 double cost_per_km = resultSet.getDouble(2);
@@ -108,6 +109,7 @@ public class TmKmServiceImpl implements ITmKmService {
                         cost_per_waiting_hour, id_tmodality);
             }
         }
+
         return tmKm;
     }
 
@@ -116,10 +118,11 @@ public class TmKmServiceImpl implements ITmKmService {
         String function = "{call tm_km_insert(?,?,?,?)}";
 
         try (CallableStatement statement = jdbcTemplate.getDataSource().getConnection().prepareCall(function)) {
+        	
             statement.setDouble(1, tmKm.getCostPerKm());
             statement.setDouble(2, tmKm.getCostPerKmGoAndBack());
             statement.setDouble(3, tmKm.getCostPerWaitingHour());
-            statement.setInt(4, tmKm.getIdTransportModality());
+            statement.setInt(4, tmodalityService.getTransportModalityByName(tmKm.getTransportModalityName()).getIdTransportModality());
             statement.execute();
         }
     }

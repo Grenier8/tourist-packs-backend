@@ -188,6 +188,12 @@ public class TouristPackServiceImpl implements ITouristPackService {
             transportServiceTouristPackService.createTransportServiceTouristPack(transportServiceTouristPack);
         }
 
+        for (DiaryActivityDto diaryActivity : touristPack.getDiaryActivities()) {
+            DiaryActivityTouristPackDto diaryActivityTouristPack = new DiaryActivityTouristPackDto(diaryActivity,
+                    insertedTouristPack);
+            diaryActivityTouristPackService.createDiaryActivityTouristPack(diaryActivityTouristPack);
+        }
+
     }
 
     @Override
@@ -275,6 +281,45 @@ public class TouristPackServiceImpl implements ITouristPackService {
             statement.execute();
         }
 
+    }
+
+    @Override
+    public List<TouristPackDto> getTouristPacksBySeason(String season) throws SQLException {
+        List<TouristPackDto> list = new ArrayList<>();
+
+        try (Connection connection = jdbcTemplate.getDataSource().getConnection()) {
+            PreparedStatement pstmt = connection.prepareStatement(
+                    "SELECT * FROM turist_pack,room_plan_season,season WHERE season.season_name = ? AND season.id_season = room_plan_season.id_season AND turist_pack.id_room_plan_season = room_plan_season.id_room_plan_season;");
+
+            pstmt.setString(1, season);
+
+            ResultSet resultSet = pstmt.executeQuery();
+
+            while (resultSet.next()) {
+                int idTouristPack = resultSet.getInt(1);
+                String promotionalName = resultSet.getString(2);
+                int daysAmount = resultSet.getInt(3);
+                int nightsAmount = resultSet.getInt(4);
+                int paxAmount = resultSet.getInt(5);
+                double totalCost = resultSet.getDouble(6);
+                double totalPrice = resultSet.getDouble(7);
+                double hotelAirportPrice = resultSet.getDouble(8);
+                int idHotel = resultSet.getInt(9);
+                int idRoomPlanSeason = resultSet.getInt(10);
+                List<TransportServiceDto> transportServices = transportServiceTouristPackService
+                        .getTransportServicesByIdTouristPack(idTouristPack);
+                List<DiaryActivityDto> diaryActivities = diaryActivityTouristPackService
+                        .getDiaryActivitiesByIdTouristPack(idTouristPack);
+
+                HotelDto hotel = hotelService.getHotelById(idHotel);
+                RoomPlanSeasonDto roomPlanSeason = roomPlanSeasonService.getRoomPlanSeasonById(idRoomPlanSeason);
+
+                list.add(new TouristPackDto(idTouristPack, promotionalName, nightsAmount, paxAmount,
+                        hotelAirportPrice, hotel, roomPlanSeason, transportServices, diaryActivities));
+            }
+        }
+
+        return list;
     }
 
 }

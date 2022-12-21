@@ -1,4 +1,4 @@
-package cu.edu.cujae.touristpacks.core.dto;
+package cu.edu.cujae.touristpacks.core.dto.security;
 
 public class RoleDto {
 	private int idRole;

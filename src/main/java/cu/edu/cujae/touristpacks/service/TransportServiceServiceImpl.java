@@ -66,8 +66,9 @@ public class TransportServiceServiceImpl implements ITransportServiceService {
     public TransportServiceDto getTransportServiceById(int transportServiceId) throws SQLException {
         TransportServiceDto transportService = null;
 
-        try (PreparedStatement pstmt = jdbcTemplate.getDataSource().getConnection().prepareStatement(
-                "SELECT * FROM transport_service where id_transport_service = ?")) {
+        try (Connection connection = jdbcTemplate.getDataSource().getConnection()) {
+            PreparedStatement pstmt = connection
+                    .prepareStatement("SELECT * FROM transport_service where id_transport_service = ?");
 
             pstmt.setInt(1, transportServiceId);
 
@@ -90,21 +91,22 @@ public class TransportServiceServiceImpl implements ITransportServiceService {
     public TransportServiceDto getTransportServiceByName(String transportServiceName) throws SQLException {
         TransportServiceDto transportService = null;
 
-        try (PreparedStatement pstmt = jdbcTemplate.getDataSource().getConnection().prepareStatement(
-                "SELECT * FROM transport_service where service_name = ?")) {
+        try (Connection connection = jdbcTemplate.getDataSource().getConnection()) {
+            PreparedStatement pstmt = connection
+                    .prepareStatement("SELECT * FROM transport_service where service_name = ?");
 
             pstmt.setString(1, transportServiceName);
 
             ResultSet resultSet = pstmt.executeQuery();
 
             while (resultSet.next()) {
-                int id_transport_service = resultSet.getInt(1);
+                int idTransportService = resultSet.getInt(1);
                 TransportModalityDto tmodality = transportModalityService.getTransportModalityById(resultSet.getInt(2));
                 VehicleDto vehicle = vehicleService.getVehicleById(resultSet.getInt(3));
-                int transport_service_price = resultSet.getInt(4);
+                int transportServicePrice = resultSet.getInt(4);
 
-                transportService = new TransportServiceDto(id_transport_service, transportServiceName, vehicle,
-                        tmodality, transport_service_price);
+                transportService = new TransportServiceDto(idTransportService, transportServiceName, vehicle,
+                        tmodality, transportServicePrice);
             }
         }
         return transportService;

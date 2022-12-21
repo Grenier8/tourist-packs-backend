@@ -35,6 +35,12 @@ public class TmKmController {
         TmKmDto tmKm = tmKmService.getTmKmById(id);
         return ResponseEntity.ok(tmKm);
     }
+    
+    @GetMapping("/name/{name}")
+    public ResponseEntity<TmKmDto> getByName(@PathVariable String name) throws SQLException {
+    	TmKmDto tmKm = tmKmService.getTmKmByName(name);
+        return ResponseEntity.ok(tmKm);
+    }
 
     @PostMapping("/")
     public ResponseEntity<String> create(@RequestBody TmKmDto tmKm) throws SQLException {

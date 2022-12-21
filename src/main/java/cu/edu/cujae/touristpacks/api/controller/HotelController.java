@@ -42,6 +42,12 @@ public class HotelController {
         return ResponseEntity.ok(hotel);
     }
 
+    @GetMapping("/modality/{modality}")
+    public ResponseEntity<List<HotelDto>> getAllByModality(@PathVariable String modality) throws SQLException {
+        List<HotelDto> list = hotelService.getHotelsByModality(modality);
+        return ResponseEntity.ok(list);
+    }
+
     @PostMapping("/")
     public ResponseEntity<String> create(@RequestBody HotelDto hotel) throws SQLException {
         hotelService.createHotel(hotel);

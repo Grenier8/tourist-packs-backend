@@ -1,4 +1,4 @@
-package cu.edu.cujae.touristpacks.api.controller;
+package cu.edu.cujae.touristpacks.api.controller.security;
 
 import java.io.IOException;
 import java.sql.SQLException;
@@ -19,10 +19,10 @@ import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RestController;
 
-import cu.edu.cujae.touristpacks.core.dto.UserDto;
+import cu.edu.cujae.touristpacks.core.dto.security.UserDto;
 import cu.edu.cujae.touristpacks.core.email.EmailSenderService;
 import cu.edu.cujae.touristpacks.core.email.Mail;
-import cu.edu.cujae.touristpacks.core.service.IUserService;
+import cu.edu.cujae.touristpacks.core.service.security.IUserService;
 import freemarker.template.TemplateException;
 
 @RestController

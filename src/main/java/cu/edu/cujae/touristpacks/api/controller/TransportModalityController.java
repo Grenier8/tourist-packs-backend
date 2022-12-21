@@ -36,6 +36,12 @@ public class TransportModalityController {
         return ResponseEntity.ok(TransportModality);
     }
 
+    @GetMapping("/name/{name}")
+    public ResponseEntity<TransportModalityDto> getByName(@PathVariable String name) throws SQLException {
+    	TransportModalityDto transportModality = transportModalityService.getTransportModalityByName(name);
+        return ResponseEntity.ok(transportModality);
+    }
+    
     @PostMapping("/")
     public ResponseEntity<String> create(@RequestBody TransportModalityDto transportModality) throws SQLException {
         transportModalityService.createTransportModality(transportModality);

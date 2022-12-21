@@ -1,4 +1,4 @@
-package cu.edu.cujae.touristpacks.core.dto;
+package cu.edu.cujae.touristpacks.core.dto.security;
 
 public class UserDto {
 	private int idUser;
@@ -9,7 +9,7 @@ public class UserDto {
 	private String email;
 
 	public UserDto() {
-		super();
+
 	}
 
 	public UserDto(String username, String password, String name, RoleDto role, String email) {

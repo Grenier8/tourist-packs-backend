@@ -1,4 +1,4 @@
-package cu.edu.cujae.touristpacks.service;
+package cu.edu.cujae.touristpacks.service.security;
 
 import java.sql.Connection;
 import java.sql.PreparedStatement;
@@ -11,8 +11,8 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.jdbc.core.JdbcTemplate;
 import org.springframework.stereotype.Service;
 
-import cu.edu.cujae.touristpacks.core.dto.RoleDto;
-import cu.edu.cujae.touristpacks.core.service.IRoleService;
+import cu.edu.cujae.touristpacks.core.dto.security.RoleDto;
+import cu.edu.cujae.touristpacks.core.service.security.IRoleService;
 
 @Service
 public class RoleServiceImpl implements IRoleService {

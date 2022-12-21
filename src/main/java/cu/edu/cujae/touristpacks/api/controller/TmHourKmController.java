@@ -36,6 +36,12 @@ public class TmHourKmController {
         return ResponseEntity.ok(tmHourKm);
     }
 
+    @GetMapping("/name/{name}")
+    public ResponseEntity<TmHourKmDto> getByName(@PathVariable String name) throws SQLException {
+    	TmHourKmDto tmHourKm = tmHourKmService.getTmHourKmByName(name);
+        return ResponseEntity.ok(tmHourKm);
+    }
+    
     @PostMapping("/")
     public ResponseEntity<String> create(@RequestBody TmHourKmDto tmHourKm) throws SQLException {
         tmHourKmService.createTmHourKm(tmHourKm);

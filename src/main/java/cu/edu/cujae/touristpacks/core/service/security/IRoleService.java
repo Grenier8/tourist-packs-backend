@@ -1,9 +1,9 @@
-package cu.edu.cujae.touristpacks.core.service;
+package cu.edu.cujae.touristpacks.core.service.security;
 
 import java.sql.SQLException;
 import java.util.List;
 
-import cu.edu.cujae.touristpacks.core.dto.RoleDto;
+import cu.edu.cujae.touristpacks.core.dto.security.RoleDto;
 
 public interface IRoleService {
 

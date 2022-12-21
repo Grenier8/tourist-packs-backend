@@ -13,21 +13,19 @@ public class TmTravelDto extends TransportModalityDto {
 
 	public TmTravelDto(String tmodalityName, String travelDescription, double costTravel, double costTravelGoAndBack,
 			int idTModality) {
-		super(tmodalityName);
+		super(idTModality, tmodalityName);
 		this.travelDescription = travelDescription;
 		this.costTravel = costTravel;
 		this.costTravelGoAndBack = costTravelGoAndBack;
-		this.idTransportModality = idTModality;
 	}
 
 	public TmTravelDto(int idTmTravel, String tmodalityName, String travelDescription, double costTravel,
 			double costTravelGoAndBack, int idTModality) {
-		super(tmodalityName);
+		super(idTModality, tmodalityName);
 		this.idTmTravel = idTmTravel;
 		this.travelDescription = travelDescription;
 		this.costTravel = costTravel;
 		this.costTravelGoAndBack = costTravelGoAndBack;
-		this.idTransportModality = idTModality;
 	}
 
 	public TmTravelDto(String tmodalityName, String travelDescription, double costTravel, double costTravelGoAndBack) {

@@ -35,6 +35,12 @@ public class VehicleController {
 	        VehicleDto vehicle = vehicleService.getVehicleById(id);
 	        return ResponseEntity.ok(vehicle);
 	    }
+	    
+	    @GetMapping("/plate/{plate}")
+	    public ResponseEntity<VehicleDto> getByPlate(@PathVariable String plate) throws SQLException {
+	    	VehicleDto vehicle = vehicleService.getVehicleByPlate(plate);
+	        return ResponseEntity.ok(vehicle);
+	    }
 
 	    @PostMapping("/")
 	    public ResponseEntity<String> create(@RequestBody VehicleDto vehicle) throws SQLException {
