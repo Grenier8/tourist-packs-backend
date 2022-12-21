@@ -17,4 +17,6 @@ public interface ITouristPackService {
     void updateTouristPack(TouristPackDto touristPack) throws SQLException;
 
     void deleteTouristPack(int idTouristPack) throws SQLException;
+
+    List<TouristPackDto> getTouristPacksBySeason(String season) throws SQLException;
 }

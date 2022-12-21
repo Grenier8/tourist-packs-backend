@@ -43,6 +43,14 @@ public class OtherServiceContractController {
         return ResponseEntity.ok(otherServiceContract);
     }
 
+    @GetMapping("/month/{month}/year/{year}")
+    public ResponseEntity<List<OtherServiceContractDto>> getAllByMonthAndYear(@PathVariable int month,
+            @PathVariable int year) throws SQLException {
+        List<OtherServiceContractDto> list = otherServiceContractService.getOtherServiceContractsByYearAndMonth(month,
+                year);
+        return ResponseEntity.ok(list);
+    }
+
     @PostMapping("/")
     public ResponseEntity<String> create(@RequestBody OtherServiceContractDto otherServiceContract)
             throws SQLException {

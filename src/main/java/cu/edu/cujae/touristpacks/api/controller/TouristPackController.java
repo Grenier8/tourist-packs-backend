@@ -42,6 +42,12 @@ public class TouristPackController {
         return ResponseEntity.ok(touristPack);
     }
 
+    @GetMapping("/season/{season}")
+    public ResponseEntity<List<TouristPackDto>> getChristmasPacks(@PathVariable String season) throws SQLException {
+        List<TouristPackDto> list = touristPackService.getTouristPacksBySeason(season);
+        return ResponseEntity.ok(list);
+    }
+
     @PostMapping("/")
     public ResponseEntity<String> create(@RequestBody TouristPackDto touristPack) throws SQLException {
         touristPackService.createTouristPack(touristPack);

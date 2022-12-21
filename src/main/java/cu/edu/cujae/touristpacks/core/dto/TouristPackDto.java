@@ -33,6 +33,8 @@ public class TouristPackDto {
 		this.roomPlanSeason = roomPlanSeason;
 		this.transportServices = transportServices;
 		this.diaryActivities = diaryActivities;
+
+		inicialateAtributes();
 	}
 
 	public TouristPackDto(int idTouristPack, String promotionalName, int daysAmount, int nightsAmount, int paxAmount,
@@ -53,28 +55,33 @@ public class TouristPackDto {
 
 	}
 
-	// private void inicialateAtributes() {
-	// try {
-	// hotelName = ServicesLocator.getHotelServices().getName(idHotel);
+	private void inicialateAtributes() {
 
-	// RoomPlanSeasonDto dto =
-	// ServicesLocator.getRoomPlanSeasonServices().get(idRoomPlanSeason);
-	// roomPlanSeasonName = dto.getRoomPlanSeasonName();
-	// hotelPrice = dto.getRoomReservedPrice();
+		hotelPrice = roomPlanSeason.getRoomReservedPrice();
 
-	// double hotelPackPrice = nightsAmount * (hotelPrice + 0.10 * hotelPrice);
-	// double transportPrice = hotelAirportPrice
-	// +
-	// ServicesLocator.getTransportServiceTuristPackServices().totalPackPrice(idPack);
-	// double activitiesPrice =
-	// ServicesLocator.getDiaryActivityTuristPackServices().totalPackPrice(idPack);
+		double hotelPackPrice = nightsAmount * (hotelPrice + 0.10 * hotelPrice);
+		double transportPrice = hotelAirportPrice + transportServicesPrice();
+		double activitiesPrice = diaryActivitiesPrice();
 
-	// double auxTotal = hotelPackPrice + transportPrice + activitiesPrice;
-	// totalPrice = auxTotal + 0.15 * auxTotal;
-	// } catch (SQLException e) {
-	// e.printStackTrace();
-	// }
-	// }
+		double auxTotal = hotelPackPrice + transportPrice + activitiesPrice;
+		totalPrice = auxTotal + 0.15 * auxTotal;
+	}
+
+	private double diaryActivitiesPrice() {
+		double total = 0f;
+		for (DiaryActivityDto diaryActivity : diaryActivities) {
+			total += 2000f / (diaryActivities.size() * 1.0);
+		}
+		return total;
+	}
+
+	private double transportServicesPrice() {
+		double total = 0f;
+		for (TransportServiceDto transportService : transportServices) {
+			total += transportService.getTranspServicePrice();
+		}
+		return total;
+	}
 
 	public int getIdTouristPack() {
 		return this.idTouristPack;
